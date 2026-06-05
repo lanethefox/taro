@@ -12,7 +12,8 @@ import {
 } from "@/db/queries/pages";
 import { requireOwner } from "@/lib/auth";
 import type { JSONContent } from "@/lib/content";
-import { removeAllLinksFor, syncPageLinks } from "@/lib/links";
+import { removeAllLinksFor, syncLinks } from "@/lib/links";
+import { syncTags } from "@/lib/tags";
 
 const createSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(200),
@@ -44,19 +45,21 @@ const saveSchema = z.object({
   content: z.unknown(),
   parentId: z.string().uuid().nullable().optional(),
   visibility: z.enum(["private", "viewer", "public"]).optional(),
+  tags: z.array(z.string()).default([]),
 });
 
 export type SaveResult =
   | { ok: true; slug: string }
   | { ok: false; error: string };
 
-/** Persist title + content, then reconcile the wikilink graph. */
+/** Persist title + content, then reconcile the wikilink graph and tags. */
 export async function savePageAction(input: {
   id: string;
   title: string;
   content: JSONContent;
   parentId?: string | null;
   visibility?: "private" | "viewer" | "public";
+  tags?: string[];
 }): Promise<SaveResult> {
   await requireOwner();
 
@@ -79,7 +82,8 @@ export async function savePageAction(input: {
   });
   if (!page) return { ok: false, error: "Page not found" };
 
-  await syncPageLinks(page.id, parsed.data.content as JSONContent);
+  await syncLinks("page", page.id, parsed.data.content as JSONContent);
+  await syncTags("page", page.id, parsed.data.tags);
 
   revalidatePath("/wiki");
   revalidatePath(`/wiki/${page.slug}`);
@@ -92,6 +96,7 @@ export async function deletePageAction(id: string): Promise<void> {
   const page = await getPageById(id);
   if (!page) return;
   await removeAllLinksFor("page", id);
+  await syncTags("page", id, []); // clear tag attachments
   await deletePage(id);
   revalidatePath("/wiki");
   redirect("/wiki");

@@ -28,6 +28,7 @@ export function PageEditor({
   initialContent,
   initialParentId,
   initialVisibility,
+  initialTags,
   parentOptions,
   linkMap,
 }: {
@@ -37,6 +38,7 @@ export function PageEditor({
   initialContent: JSONContent | null;
   initialParentId: string | null;
   initialVisibility: Visibility;
+  initialTags: string[];
   parentOptions: { id: string; title: string }[];
   linkMap: Record<string, string>;
 }) {
@@ -45,11 +47,16 @@ export function PageEditor({
   const [title, setTitle] = useState(initialTitle);
   const [parentId, setParentId] = useState<string>(initialParentId ?? "");
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
+  const [tagInput, setTagInput] = useState(initialTags.join(", "));
   const [saving, startSaving] = useTransition();
   const [deleting, startDeleting] = useTransition();
 
   function handleSave() {
     const content = editorRef.current?.getJSON() ?? { type: "doc" };
+    const tags = tagInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
     startSaving(async () => {
       const res = await savePageAction({
         id,
@@ -57,6 +64,7 @@ export function PageEditor({
         content: content as JSONContent,
         parentId: parentId || null,
         visibility,
+        tags,
       });
       if (res.ok) {
         toast.success("Saved");
@@ -139,6 +147,15 @@ export function PageEditor({
             <option value="viewer">Viewers</option>
             <option value="public">Public</option>
           </select>
+        </label>
+        <label className="flex flex-1 items-center gap-1.5 text-muted-foreground">
+          Tags
+          <Input
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            placeholder="comma, separated"
+            className="h-8"
+          />
         </label>
       </div>
 

@@ -39,7 +39,7 @@ makes taro more than four separate tools.
 Blog, decisions, catalog, ERD, and search render as placeholders that get built
 out in M1 (remaining slices) – M3.
 
-## Status — Milestone M1 (Knowledge core), slice 1
+## Status — Milestone M1 (Knowledge core) ✅
 
 - [x] TipTap block editor (headings, lists, code blocks, quotes) with a toolbar
 - [x] Custom **`[[wikilink]]`** extension — typing `[[Title]]` creates a link
@@ -47,9 +47,16 @@ out in M1 (remaining slices) – M3.
       (red links auto-create stub pages so the graph stays connected)
 - [x] Pages: tree (via `parent_id`) + create / edit / delete, slugged routes,
       reader + inline editor, visibility control
-- [x] **Backlinks panel** ("referenced by") on every page
-- [ ] Next slices: posts + decision records · tags + FTS/trigram search ·
-      LinkedIn export
+- [x] **Backlinks panel** ("referenced by") on every page — spans pages *and* posts
+- [x] **Posts** (blog) + **decision records** (ADRs with context / decision /
+      consequences / status + `supersedes`), draft/published, same editor
+- [x] **Tags** on pages and posts + tag index and per-tag pages
+- [x] Global **search** — Postgres full-text (ranked) + trigram fuzzy on titles
+- [x] **LinkedIn export** — post → clean Markdown / plain text (route + copy menu)
+- [x] Strategy-library Concept pages seeded (M0)
+
+Next: **M2 — Catalog** (models / sources / columns / tests, lineage graph,
+observation metadata), after a polish pass.
 
 ## Getting started
 

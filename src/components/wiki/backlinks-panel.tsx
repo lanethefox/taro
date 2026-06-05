@@ -23,9 +23,14 @@ export function BacklinksPanel({ backlinks }: { backlinks: Backlink[] }) {
           {backlinks.map((b) => (
             <li key={`${b.sourceType}:${b.sourceId}`}>
               <Link
-                href={`/wiki/${b.slug}`}
-                className="inline-flex items-center rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
+                href={b.href}
+                className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
               >
+                {b.sourceType === "post" ? (
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    post
+                  </span>
+                ) : null}
                 {b.title}
               </Link>
             </li>

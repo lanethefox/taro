@@ -5,6 +5,7 @@ import { Hash, Pencil } from "lucide-react";
 import { getPageBySlug, listPages } from "@/db/queries/pages";
 import { getSessionContext, isOwner } from "@/lib/auth";
 import { getBacklinks } from "@/lib/links";
+import { getTagsForNode } from "@/lib/tags";
 import type { JSONContent } from "@/lib/content";
 import { ContentView } from "@/components/editor/content-view";
 import { Button } from "@/components/ui/button";
@@ -52,6 +53,7 @@ export default async function WikiPageView({
   const linkMap: Record<string, string> = {};
   for (const p of visiblePages) linkMap[p.title.toLowerCase()] = p.slug;
 
+  const pageTags = await getTagsForNode("page", page.id);
   const editing = owner && edit === "1";
 
   if (editing) {
@@ -63,15 +65,16 @@ export default async function WikiPageView({
         initialContent={page.content as JSONContent | null}
         initialParentId={page.parentId}
         initialVisibility={page.visibility}
+        initialTags={pageTags.map((t) => t.name)}
         parentOptions={allPages.map((p) => ({ id: p.id, title: p.title }))}
         linkMap={linkMap}
       />
     );
   }
 
-  const backlinks = (await getBacklinks("page", page.id)).filter(
-    (b) => owner || visiblePages.some((p) => p.id === b.sourceId),
-  );
+  const backlinks = await getBacklinks("page", page.id, {
+    includePrivate: owner,
+  });
 
   return (
     <article className="mx-auto max-w-3xl px-6 py-8">
@@ -99,6 +102,20 @@ export default async function WikiPageView({
           </Button>
         ) : null}
       </div>
+
+      {pageTags.length > 0 ? (
+        <div className="mb-5 flex flex-wrap gap-2">
+          {pageTags.map((t) => (
+            <Link
+              key={t.id}
+              href={`/tags/${t.slug}`}
+              className="rounded-full border bg-card px-2.5 py-0.5 text-xs hover:bg-muted"
+            >
+              #{t.name}
+            </Link>
+          ))}
+        </div>
+      ) : null}
 
       <ContentView content={page.content as JSONContent | null} linkMap={linkMap} />
 
