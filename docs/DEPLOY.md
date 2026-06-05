@@ -18,13 +18,22 @@ There are three things to set up, in order:
 2. Once it's provisioned, collect these (Project Settings):
    - **Project URL** — Settings → API → `Project URL`
      → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public key** — Settings → API → `anon` `public`
+   - **Public client key** — Settings → API. Either the new
+     **publishable key** (`sb_publishable_…`) or the legacy **anon** key.
      → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - **service_role key** — Settings → API → `service_role` (secret!)
+   - **Secret key** — Settings → API. Either the new **secret key**
+     (`sb_secret_…`) or the legacy **service_role** key (secret!).
      → `SUPABASE_SERVICE_ROLE_KEY`
-   - **Connection string** — Settings → Database → Connection string →
-     **URI**. Use the **Transaction pooler** (port `6543`) for the app.
+   - **Connection string** — click **Connect** (top bar) → **ORMs** / URI.
+     Use the **Transaction pooler** (port `6543`) for the app.
      → `DATABASE_URL`
+
+> taro accepts both the new and legacy key names, so you can set either
+> `NEXT_PUBLIC_SUPABASE_ANON_KEY` **or** `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+> and either `SUPABASE_SERVICE_ROLE_KEY` **or** `SUPABASE_SECRET_KEY`.
+
+> Ignore Supabase's "Install packages / Add UI components" quickstart — this
+> repo already has `@supabase/ssr` wired. You only need the values above.
 
 > Use the **Session pooler / direct** connection (port `5432`) only if you run
 > migrations from your laptop (see step 4). The app itself uses the transaction
@@ -87,8 +96,8 @@ OAuth client ID → type **Web application**:
    | Key | Value |
    |---|---|
    | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
-   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role key (secret) |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | publishable (`sb_publishable_…`) or anon key |
+   | `SUPABASE_SERVICE_ROLE_KEY` | secret (`sb_secret_…`) or service_role key |
    | `DATABASE_URL` | Supabase **transaction pooler** URI (port 6543) |
 
 4. Deploy. Note your URL, e.g. `https://taro-xxxx.vercel.app`.
