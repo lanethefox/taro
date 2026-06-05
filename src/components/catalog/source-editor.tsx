@@ -29,6 +29,7 @@ export function SourceEditor({
   initialName,
   initialDescription,
   initialSystem,
+  initialGrain,
   initialFreshnessSla,
   initialExpectedVolume,
   initialMonitoringNotes,
@@ -41,6 +42,7 @@ export function SourceEditor({
   initialName: string;
   initialDescription: string;
   initialSystem: string;
+  initialGrain: string;
   initialFreshnessSla: string;
   initialExpectedVolume: string;
   initialMonitoringNotes: string;
@@ -53,6 +55,7 @@ export function SourceEditor({
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
   const [system, setSystem] = useState(initialSystem);
+  const [grain, setGrain] = useState(initialGrain);
   const [freshnessSla, setFreshnessSla] = useState(initialFreshnessSla);
   const [expectedVolume, setExpectedVolume] = useState(initialExpectedVolume);
   const [monitoringNotes, setMonitoringNotes] = useState(initialMonitoringNotes);
@@ -69,6 +72,7 @@ export function SourceEditor({
         name,
         description,
         system,
+        grain,
         freshnessSla,
         expectedVolume,
         monitoringNotes,
@@ -139,7 +143,27 @@ export function SourceEditor({
         className="mb-4 h-auto border-0 px-0 font-mono text-3xl font-semibold shadow-none focus-visible:ring-0"
       />
 
-      <div className="mb-5 flex flex-wrap items-end gap-3 text-sm">
+      <div className="mb-5 space-y-1">
+        <Label>Definition</Label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className={areaCls}
+          placeholder="What this source is and where it comes from."
+        />
+      </div>
+
+      <div className="mb-5 space-y-1">
+        <Label>Grain</Label>
+        <Input
+          value={grain}
+          onChange={(e) => setGrain(e.target.value)}
+          placeholder="one row per … (what a single record represents)"
+          className="h-8"
+        />
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-end gap-3 text-sm">
         <label className="flex flex-1 items-center gap-1.5 text-muted-foreground">
           System
           <Input
@@ -161,16 +185,6 @@ export function SourceEditor({
             <option value="public">Public</option>
           </select>
         </label>
-      </div>
-
-      <div className="mb-5 space-y-1">
-        <Label>Description</Label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className={areaCls}
-          placeholder="What this source is and where it comes from."
-        />
       </div>
 
       <div className="mb-6 space-y-4 rounded-lg border bg-card p-4">

@@ -7,7 +7,18 @@
 A single-owner (multi-viewer) knowledge platform for analytics engineering:
 wiki + blog/decision log + **case studies** + (coming) data catalog + ERD, all
 one linked knowledge graph. Full spec in `docs/SPEC.md`, build order in
-`docs/BUILD-PLAN.md`, deploy steps in `docs/DEPLOY.md`.
+`docs/BUILD-PLAN.md`, deploy steps in `docs/DEPLOY.md`. **Design philosophy in
+`docs/DESIGN-PRINCIPLES.md`** — read it; it governs modeling/design calls
+(coherence over collection; nodes carry meaning + grain; concepts are the
+semantic layer; capture the why; model for humans *and* machines).
+
+## Active re-plan (2026-06)
+Adopted `DESIGN-PRINCIPLES.md` and re-planned M2–M4 around it (BUILD-PLAN §4):
+catalog gains **grain on sources** + definition-led readers + **decision↔node
+links**; a new **M2.5 semantic layer** (Glossary + catalog/concepts in search +
+coherence nudges) is pulled forward from polish; M4 gains a **machine-readable
+context bundle**. PR #3 (catalog CRUD + concept linking) is the first slice and
+stays as-is; the principle-driven additions land next.
 
 ## Where the build is (2026-06)
 - **M0 Foundation** — done, **merged to `main`** (PR #1). App shell, Supabase
@@ -52,7 +63,7 @@ one linked knowledge graph. Full spec in `docs/SPEC.md`, build order in
 
 ## Migrations (IMPORTANT)
 - Migrations live in `drizzle/` (checked in). **Applied so far: `0000_init`,
-  `0001_case_studies`.** Policies: `supabase/policies.sql` (idempotent) +
+  `0001_case_studies`, `0002_add_source_grain`.** Policies: `supabase/policies.sql` (idempotent) +
   `supabase/policies_case_studies.sql`. Seed: `supabase/seed.sql` (6 concepts).
 - The agent has **no DB access from the sandbox** unless a Supabase MCP server
   or `DATABASE_URL` env secret is configured. Generate migrations with

@@ -275,6 +275,7 @@ export const sources = pgTable(
     name: text("name").notNull(),
     description: text("description"),
     system: text("system"),
+    grain: text("grain"),
     freshnessSla: text("freshness_sla"),
     expectedVolume: text("expected_volume"),
     monitoringNotes: text("monitoring_notes"),

@@ -148,14 +148,29 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
 - [ ] Seed the strategy library (Concept pages) from `supabase/seed.sql`.
 
 ### M2 — Catalog
-- [ ] Models / sources / columns CRUD with all metadata fields.
-- [ ] Inline column tests (`not_null`, `unique`, `accepted_values`,
-      `relationships`).
+> Re-planned around `DESIGN-PRINCIPLES.md`: a node carries its *meaning*
+> (definition + grain), not just its structure; rationale travels with structure.
+- [x] Models / sources / columns CRUD with all metadata fields.
+- [x] Inline column tests; PK/FK flags; observation metadata.
+- [x] Concept ↔ catalog linking (a node's "Related concepts"; concept backlinks
+      list the models/sources that use them — both directions).
+- [ ] **Grain & definition first-class** — grain on *sources* too; lead reader
+      views with name → definition → grain → structure → links (Principles 1, 3).
+- [ ] **Capture the why** — decision records link to catalog/concept nodes; a
+      model shows the decisions that shaped it (Principle 4).
 - [ ] `model_dependencies` → **lineage graph** (React Flow), upstream/downstream
-      navigation.
-- [ ] Observation metadata (freshness SLA, expected volume, monitoring notes).
-- [ ] Concept ↔ catalog linking (materialization/observation pages list the
-      models that use them).
+      navigation (the "how-it-connects" structural layer).
+
+### M2.5 — Semantic layer (new)
+> Where coherence becomes a feature (Principles 2, 5). Pulled forward from polish.
+- [ ] **"How taro thinks"** explainer page (in-app surface of the core concept;
+      copy drafted in `DESIGN-PRINCIPLES.md` → *The idea, in plain terms*).
+- [ ] **Glossary** surface: concepts as canonical definitions, each with
+      *defined here* + *used by* (graph-wide backlinks).
+- [ ] Catalog nodes (models / sources / columns) + concept definitions are
+      **searchable** (extend FTS/trigram beyond pages/posts).
+- [ ] Coherence nudges (non-blocking): offer to link a term that has a concept;
+      flag near-duplicate concept titles.
 
 ### M3 — ERD designer
 - [ ] React Flow canvas; table nodes render columns + keys from catalog models.
@@ -165,7 +180,10 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
 - [ ] Exports: PNG/SVG, **DBML**, **SQL DDL**, **dbt `schema.yml`**.
 
 ### M4 — Polish & demo
-- [ ] Command-palette global search/navigation.
+- [ ] Command-palette global search/navigation (over the whole graph, incl.
+      definitions).
+- [ ] **Machine-readable context bundle** — definitions + grain + relationships +
+      links as JSON, for agent/LLM consumption (Principle 5, north star).
 - [ ] `revisions` history for pages/posts.
 - [ ] Per-post public sharing (visibility flag + unauth render).
 - [ ] Light/dark theme + reading typography.

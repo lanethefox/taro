@@ -65,6 +65,13 @@ Every meaningful object in taro is a **node** in a single graph, and any node ca
 **link** to any other node. That graph is what makes taro more than four separate
 tools.
 
+> The graph exists to serve **coherence**: one definition per concept, one place
+> a model's grain is stated, every node traceable to the others. The reasoning —
+> nodes carry meaning (not just structure), concepts are the semantic layer,
+> grain is first-class, rationale travels with structure, and we model for humans
+> *and* machines — is in `docs/DESIGN-PRINCIPLES.md`, which governs design calls
+> across all surfaces.
+
 Node kinds:
 
 | Node | What it is |

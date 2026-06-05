@@ -94,7 +94,6 @@ export async function ModelDetail({
               {layerLabel[model.layer] ?? model.layer}
             </span>
             <span>· {model.materialization}</span>
-            {model.grain ? <span>· {model.grain}</span> : null}
             <span>· {model.visibility}</span>
           </p>
         </div>
@@ -110,8 +109,17 @@ export async function ModelDetail({
       </div>
 
       {model.description ? (
-        <p className="mb-6 whitespace-pre-wrap text-sm text-muted-foreground">
+        <p className="mb-5 whitespace-pre-wrap text-base leading-relaxed text-foreground/90">
           {model.description}
+        </p>
+      ) : null}
+
+      {model.grain ? (
+        <p className="mb-6 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
+          <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Grain
+          </span>
+          <span className="font-medium">{model.grain}</span>
         </p>
       ) : null}
 

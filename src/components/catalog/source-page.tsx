@@ -43,6 +43,7 @@ export async function SourceDetail({
         initialName={source.name}
         initialDescription={source.description ?? ""}
         initialSystem={source.system ?? ""}
+        initialGrain={source.grain ?? ""}
         initialFreshnessSla={source.freshnessSla ?? ""}
         initialExpectedVolume={source.expectedVolume ?? ""}
         initialMonitoringNotes={source.monitoringNotes ?? ""}
@@ -99,8 +100,17 @@ export async function SourceDetail({
       </div>
 
       {source.description ? (
-        <p className="mb-6 whitespace-pre-wrap text-sm text-muted-foreground">
+        <p className="mb-5 whitespace-pre-wrap text-base leading-relaxed text-foreground/90">
           {source.description}
+        </p>
+      ) : null}
+
+      {source.grain ? (
+        <p className="mb-6 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-sm">
+          <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Grain
+          </span>
+          <span className="font-medium">{source.grain}</span>
         </p>
       ) : null}
 
