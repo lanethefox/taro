@@ -163,6 +163,8 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
 
 ### M2.5 — Semantic layer (new)
 > Where coherence becomes a feature (Principles 2, 5). Pulled forward from polish.
+- [ ] **"How taro thinks"** explainer page (in-app surface of the core concept;
+      copy drafted in `DESIGN-PRINCIPLES.md` → *The idea, in plain terms*).
 - [ ] **Glossary** surface: concepts as canonical definitions, each with
       *defined here* + *used by* (graph-wide backlinks).
 - [ ] Catalog nodes (models / sources / columns) + concept definitions are

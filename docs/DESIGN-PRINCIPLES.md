@@ -23,6 +23,45 @@ Everything below serves that claim.
 
 ---
 
+## The idea, in plain terms (in-product explainer)
+
+> This section is written as reader-facing copy — the source text for an in-app
+> **"How taro thinks"** surface (see roadmap). Keep it plain; it's for a viewer or
+> interviewer, not just the maintainer.
+
+**One graph, one meaning.**
+
+In most data orgs the knowledge is scattered across tools that don't talk: the
+catalog knows a table's shape, the wiki holds the theory, the decision log holds
+the reasoning, the diagram shows how things relate. So the same word — *customer*,
+*revenue*, *active user* — quietly comes to mean three different things in three
+places, and the contradictions surface later as numbers that don't match and
+dashboards nobody trusts.
+
+taro takes the opposite bet: **every artifact is a node in one graph, and meaning
+is shared, not copied.** A concept is defined once. A model states what one of its
+rows represents. A decision records *why* it's shaped that way — and links to the
+models it shaped. Open any node and you can walk to the rest: a model → the
+concept that defines its terms → the decision that motivated it → the post that
+explains it.
+
+Three things make that work:
+
+- **Definitions live in one place.** *Customer* is a concept, defined once; the
+  catalog model, the column, and the post point at that definition instead of
+  silently restating (and contradicting) it.
+- **Every node carries its meaning.** Not just columns and types — a plain-language
+  definition and its **grain** ("what one row represents"), the facts that keep
+  every downstream count and join honest.
+- **It's written for people *and* machines.** Because meaning is explicit, a person
+  reading the catalog, a search query, and — eventually — an AI agent all work from
+  the same definitions. No guessing.
+
+The payoff is coherence. Ask *"what is a customer, where is it modeled, and why?"*
+and taro answers in one walk of the graph — instead of a meeting.
+
+---
+
 ## 1. A node carries its meaning, not just its structure
 
 A catalog model is not a column list. It is three layers, and taro should make
@@ -123,5 +162,38 @@ thread** and re-order so coherence shows up early rather than as polish.
 | Model for machines (5) | catalog + concepts in search; later, context export | M2.5 → M4 |
 | Many forms (6) | keep node enum open; no build yet | — |
 | Just-in-time (7) | the slice cadence itself | ongoing |
+| The concept itself | in-app **"How taro thinks"** explainer page | M2.5 |
 
 See `BUILD-PLAN.md` §4 for the revised M2–M4 checklists.
+
+## Build-ready deltas
+
+So the re-plan is unambiguous when we resume building — what each change actually
+touches:
+
+- **Grain on sources (P3)** — add `sources.grain text` (one Drizzle migration);
+  thread through `createSource`/`updateSource`, the source editor, and the reader.
+  Models already have `grain`; the work is parity + promotion to a headline field.
+- **Definition-led readers (P1)** — presentation only, no schema change: reorder
+  model/source reader views to *name → definition (`description`) → grain →*
+  *columns → links*, and make grain/definition prominent (not buried) in editors.
+- **Decision↔node links (P4)** — no schema change. The `links` graph + node-type
+  enum already allow `post → model/source`. Add a "Related decisions / rationale"
+  picker on catalog nodes (mirror the existing concept picker, target posts of
+  `kind = decision`) via `setLinkedPages`-style helpers generalized to posts;
+  surface a "Why" block on the node and the model under the decision's backlinks.
+- **Glossary (P2)** — new read-only surface listing `kind = concept` pages as
+  definitions with their graph-wide backlinks. Route TBD (default: `/glossary`,
+  also usable as the viewer landing). No schema change.
+- **Catalog + concepts in search (P5)** — extend `src/lib/search.ts` /
+  `search_tsv` coverage to models, sources, columns, and concept definitions
+  (currently pages/posts). May add generated `tsvector` columns to catalog tables
+  (migration) or index via a unified search view — decide at build time.
+- **Coherence nudges (P2)** — heuristic + non-blocking: detect a node's text
+  mentioning a term that has a concept but isn't linked; flag near-duplicate
+  concept titles. App-level, no schema change.
+- **"How taro thinks" page** — static surface seeded from the explainer above;
+  reachable from the app shell. No schema change.
+- **Machine-readable context bundle (P5, M4)** — a JSON export of definitions +
+  grain + relationships + links; extends the planned `whole-catalog → JSON`
+  (SPEC §7). Design later.
