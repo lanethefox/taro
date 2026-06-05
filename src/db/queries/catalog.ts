@@ -23,7 +23,7 @@ export type ModelListItem = Pick<
 
 export type SourceListItem = Pick<
   Source,
-  "id" | "name" | "system" | "visibility" | "updatedAt"
+  "id" | "name" | "system" | "grain" | "visibility" | "updatedAt"
 >;
 
 /** A column with its inline tests narrowed to a string list. */
@@ -54,6 +54,7 @@ export async function listSources(): Promise<SourceListItem[]> {
       id: sources.id,
       name: sources.name,
       system: sources.system,
+      grain: sources.grain,
       visibility: sources.visibility,
       updatedAt: sources.updatedAt,
     })
@@ -169,6 +170,7 @@ export async function updateSource(
     name?: string;
     description?: string | null;
     system?: string | null;
+    grain?: string | null;
     freshnessSla?: string | null;
     expectedVolume?: string | null;
     monitoringNotes?: string | null;
@@ -179,6 +181,7 @@ export async function updateSource(
   if (input.name !== undefined) patch.name = input.name.trim() || "untitled_source";
   if (input.description !== undefined) patch.description = input.description;
   if (input.system !== undefined) patch.system = input.system;
+  if (input.grain !== undefined) patch.grain = input.grain;
   if (input.freshnessSla !== undefined) patch.freshnessSla = input.freshnessSla;
   if (input.expectedVolume !== undefined) patch.expectedVolume = input.expectedVolume;
   if (input.monitoringNotes !== undefined) patch.monitoringNotes = input.monitoringNotes;

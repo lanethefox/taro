@@ -155,6 +155,26 @@ export function ModelEditor({
         className="mb-4 h-auto border-0 px-0 font-mono text-3xl font-semibold shadow-none focus-visible:ring-0"
       />
 
+      <div className="mb-5 space-y-1">
+        <Label>Definition</Label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className={areaCls}
+          placeholder="What this model represents and how it's built."
+        />
+      </div>
+
+      <div className="mb-5 space-y-1">
+        <Label>Grain</Label>
+        <Input
+          value={grain}
+          onChange={(e) => setGrain(e.target.value)}
+          placeholder="one row per … (what a single record represents)"
+          className="h-8"
+        />
+      </div>
+
       <div className="mb-5 flex flex-wrap items-center gap-3 text-sm">
         <label className="flex items-center gap-1.5 text-muted-foreground">
           Layer
@@ -193,26 +213,6 @@ export function ModelEditor({
             <option value="public">Public</option>
           </select>
         </label>
-      </div>
-
-      <div className="mb-5 space-y-1">
-        <Label>Grain</Label>
-        <Input
-          value={grain}
-          onChange={(e) => setGrain(e.target.value)}
-          placeholder="one row per …"
-          className="h-8"
-        />
-      </div>
-
-      <div className="mb-5 space-y-1">
-        <Label>Description</Label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className={areaCls}
-          placeholder="What this model represents and how it's built."
-        />
       </div>
 
       <div className="mb-5 space-y-1">

@@ -123,6 +123,11 @@ export function CatalogList({
                   <span className="min-w-0 flex-1 truncate font-mono text-sm font-medium">
                     {s.name}
                   </span>
+                  {s.grain ? (
+                    <span className="hidden truncate text-xs text-muted-foreground sm:inline">
+                      {s.grain}
+                    </span>
+                  ) : null}
                   {s.system ? (
                     <span className="shrink-0 text-xs text-muted-foreground">
                       {s.system}
