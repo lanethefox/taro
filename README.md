@@ -93,6 +93,12 @@ pnpm dev   # http://localhost:3000
 The first account to sign in becomes the **owner**. Everyone else joins as a
 **viewer**.
 
+## Deploying
+
+A full step-by-step for a free-tier Vercel + Supabase deploy lives in
+[`docs/DEPLOY.md`](docs/DEPLOY.md) — Supabase project + schema, Google/GitHub
+OAuth, Vercel import, env vars, and post-deploy auth wiring.
+
 ## Scripts
 
 | Script | Purpose |
