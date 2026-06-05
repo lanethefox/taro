@@ -100,7 +100,20 @@ export const nodeTypeEnum = pgEnum("node_type", [
   "column",
   "diagram",
   "tag",
+  "case_study",
+  "task",
 ]);
+
+export const caseStudyTrackEnum = pgEnum("case_study_track", [
+  "technical",
+  "business",
+]);
+export const taskStatusEnum = pgEnum("task_status", [
+  "todo",
+  "in_progress",
+  "done",
+]);
+export const taskKindEnum = pgEnum("task_kind", ["baseline", "improvement"]);
 
 /* -------------------------------------------------------------------------- */
 /* Auth / identity                                                             */
@@ -454,6 +467,56 @@ export const revisions = pgTable(
 );
 
 /* -------------------------------------------------------------------------- */
+/* Case studies (interactive, gamified completion curriculum)                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * A scenario (e.g. ClassDojo) where the theory in Concept pages is made
+ * material. Each case study seeds a curriculum of tasks across a technical and
+ * a business/stakeholder track; completing them all represents a gap-free,
+ * end-to-end analytics build.
+ */
+export const caseStudies = pgTable(
+  "case_studies",
+  {
+    id: id(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    scenario: text("scenario"),
+    content: jsonb("content"),
+    visibility: visibilityEnum("visibility").notNull().default("private"),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("case_studies_slug_idx").on(t.slug)],
+);
+
+/** A single thing-to-complete inside a case study, with an editor workspace. */
+export const caseStudyTasks = pgTable(
+  "case_study_tasks",
+  {
+    id: id(),
+    caseStudyId: uuid("case_study_id")
+      .notNull()
+      .references(() => caseStudies.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    track: caseStudyTrackEnum("track").notNull().default("technical"),
+    category: text("category"),
+    title: text("title").notNull(),
+    description: text("description"),
+    content: jsonb("content"),
+    status: taskStatusEnum("status").notNull().default("todo"),
+    kind: taskKindEnum("kind").notNull().default("baseline"),
+    position: integer("position").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    index("case_study_tasks_study_idx").on(t.caseStudyId),
+    uniqueIndex("case_study_tasks_slug_idx").on(t.caseStudyId, t.slug),
+  ],
+);
+
+/* -------------------------------------------------------------------------- */
 /* Inferred types                                                              */
 /* -------------------------------------------------------------------------- */
 
@@ -472,4 +535,9 @@ export type DiagramNode = typeof diagramNodes.$inferSelect;
 export type DiagramEdge = typeof diagramEdges.$inferSelect;
 export type Attachment = typeof attachments.$inferSelect;
 export type Revision = typeof revisions.$inferSelect;
+export type CaseStudy = typeof caseStudies.$inferSelect;
+export type CaseStudyTask = typeof caseStudyTasks.$inferSelect;
 export type NodeType = (typeof nodeTypeEnum.enumValues)[number];
+export type CaseStudyTrack = (typeof caseStudyTrackEnum.enumValues)[number];
+export type TaskStatus = (typeof taskStatusEnum.enumValues)[number];
+export type TaskKind = (typeof taskKindEnum.enumValues)[number];

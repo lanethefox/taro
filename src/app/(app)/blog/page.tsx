@@ -1,20 +1,12 @@
-import { PenLine } from "lucide-react";
+import { listPosts } from "@/db/queries/posts";
+import { getSessionContext, isOwner } from "@/lib/auth";
+import { PostList } from "@/components/posts/post-list";
 
-import { ModulePlaceholder } from "@/components/shell/module-placeholder";
+export const metadata = { title: "Blog" };
 
-export default function BlogPage() {
-  return (
-    <ModulePlaceholder
-      icon={PenLine}
-      title="Blog"
-      description="Turn daily analytics-engineering work into shareable, IP-safe writing."
-      milestone="M1 — Knowledge core"
-      capabilities={[
-        "Posts with draft/published status and per-post visibility.",
-        "Same block editor as the wiki, with wikilinks into the graph.",
-        "One-click LinkedIn export to clean markdown / plain text.",
-        "Tags and tag pages.",
-      ]}
-    />
-  );
+export default async function BlogPage() {
+  const [posts, ctx] = await Promise.all([listPosts("blog"), getSessionContext()]);
+  const owner = isOwner(ctx);
+  const visible = owner ? posts : posts.filter((p) => p.visibility !== "private");
+  return <PostList posts={visible} kind="blog" owner={owner} />;
 }

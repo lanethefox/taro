@@ -1,11 +1,13 @@
 import {
   BookOpen,
   Boxes,
+  Compass,
   GitBranch,
   Network,
   PenLine,
   ScrollText,
   Search,
+  Tag,
   type LucideIcon,
 } from "lucide-react";
 
@@ -29,7 +31,12 @@ export const navSections: NavSection[] = [
       { label: "Wiki", href: "/wiki", icon: BookOpen },
       { label: "Blog", href: "/blog", icon: PenLine },
       { label: "Decisions", href: "/decisions", icon: ScrollText },
+      { label: "Tags", href: "/tags", icon: Tag },
     ],
+  },
+  {
+    title: "Practice",
+    items: [{ label: "Case Studies", href: "/case-studies", icon: Compass }],
   },
   {
     title: "Catalog",
