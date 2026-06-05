@@ -22,9 +22,12 @@ one linked knowledge graph. Full spec in `docs/SPEC.md`, build order in
 - **Dorfromantik theme** — done. Parchment/ink + sage/terracotta/wheat/slate,
   Hanken Grotesk, paper grain, `.tile` cards. App-wide via tokens in
   `globals.css`.
-- **Next up: M2 — Catalog** (models/sources/columns/tests, lineage graph via
-  React Flow, observation metadata, concept↔catalog linking). Then M3 ERD, M4
-  polish.
+- **M2 — Catalog** — in progress. **Done:** models/sources/columns CRUD
+  (per-node detail + editor, inline column tests, PK/FK flags, observation
+  metadata) and concept↔catalog linking (a "Related concepts" picker writes
+  `links` rows; catalog refs show in a concept's backlinks, both directions).
+  **Remaining:** lineage graph (React Flow over `model_dependencies`),
+  relationships UI. Then M3 ERD, M4 polish.
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want
@@ -85,9 +88,12 @@ one linked knowledge graph. Full spec in `docs/SPEC.md`, build order in
   never see `private`). RLS is defense-in-depth.
 - **Graph**: `src/lib/links.ts` — `syncLinks(sourceType, id, doc)` reconciles
   `[[wikilink]]` → page targets (auto-creates stub pages for red links);
-  `getBacklinks(type, id, {includePrivate})` resolves page/post/task sources;
-  `nodeHref` routes them. Node types in use: `page`, `post`, `case_study`,
-  `task`. Add a node type to the enum (migration) before storing its links.
+  catalog nodes have plain-text descriptions (no wikilinks) so they link to
+  concepts via `setLinkedPages`/`getLinkedPages` (explicit picker, not parsed);
+  `getBacklinks(type, id, {includePrivate})` resolves page/post/task/model/source
+  sources; `nodeHref` routes them. Node types in use: `page`, `post`,
+  `case_study`, `task`, `model`, `source`. Add a node type to the enum
+  (migration) before storing its links.
 - **Content** is TipTap JSON in `jsonb`. `src/lib/content.ts` walks it
   (`extractWikilinkTitles`, `excerpt`). `src/lib/export/markdown.ts` →
   LinkedIn markdown. `src/lib/slug.ts` slugifies; queries ensure uniqueness.
