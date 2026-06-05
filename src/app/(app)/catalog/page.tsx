@@ -1,21 +1,24 @@
-import { Boxes } from "lucide-react";
+import { listModels, listSources } from "@/db/queries/catalog";
+import { getSessionContext, isOwner } from "@/lib/auth";
+import { CatalogList } from "@/components/catalog/catalog-list";
 
-import { ModulePlaceholder } from "@/components/shell/module-placeholder";
+export const metadata = { title: "Catalog" };
 
-export default function CatalogPage() {
+export default async function CatalogPage() {
+  const [models, sources, ctx] = await Promise.all([
+    listModels(),
+    listSources(),
+    getSessionContext(),
+  ]);
+  const owner = isOwner(ctx);
+  const visibleModels = owner
+    ? models
+    : models.filter((m) => m.visibility !== "private");
+  const visibleSources = owner
+    ? sources
+    : sources.filter((s) => s.visibility !== "private");
+
   return (
-    <ModulePlaceholder
-      icon={Boxes}
-      title="Data catalog"
-      description="Models, sources, and columns — with tests and observation metadata."
-      milestone="M2 — Catalog"
-      capabilities={[
-        "Models: layer, materialization, grain, owner, SQL notes.",
-        "Sources with freshness expectations and expected volume.",
-        "Columns with data types, PK/FK flags, and inline tests.",
-        "Observation metadata: freshness SLA, expected volume, monitoring notes.",
-        "Concept ↔ catalog linking, both directions.",
-      ]}
-    />
+    <CatalogList models={visibleModels} sources={visibleSources} owner={owner} />
   );
 }

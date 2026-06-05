@@ -7,8 +7,10 @@ import {
   caseStudies,
   caseStudyTasks,
   links,
+  models,
   pages,
   posts,
+  sources,
   type NodeType,
 } from "@/db/schema";
 import { extractWikilinkTitles, type JSONContent } from "@/lib/content";
@@ -35,9 +37,82 @@ export function nodeHref(
       return kind === "decision" ? `/decisions/${slug}` : `/blog/${slug}`;
     case "case_study":
       return `/case-studies/${slug}`;
+    case "model":
+      return `/catalog/models/${slug}`;
+    case "source":
+      return `/catalog/sources/${slug}`;
     default:
       return "#";
   }
+}
+
+/**
+ * Pages a catalog (or other) node links *to* — the forward "Related concepts"
+ * direction. Replaces wikilinks for catalog nodes, whose descriptions are plain
+ * text. Private pages are omitted unless `includePrivate` (owner view).
+ */
+export async function getLinkedPages(
+  sourceType: NodeType,
+  sourceId: string,
+  { includePrivate = false }: { includePrivate?: boolean } = {},
+): Promise<{ id: string; title: string; slug: string }[]> {
+  const rows = await db
+    .select({
+      title: pages.title,
+      slug: pages.slug,
+      id: pages.id,
+      visibility: pages.visibility,
+    })
+    .from(links)
+    .innerJoin(pages, eq(pages.id, links.targetId))
+    .where(
+      and(
+        eq(links.sourceType, sourceType),
+        eq(links.sourceId, sourceId),
+        eq(links.targetType, "page"),
+      ),
+    );
+
+  return rows
+    .filter((r) => includePrivate || r.visibility !== "private")
+    .map((r) => ({ id: r.id, title: r.title, slug: r.slug }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/**
+ * Replace a node's outgoing page-links with an explicit set of page ids. Used
+ * by the catalog "Related concepts" picker (catalog nodes carry no wikilinks).
+ */
+export async function setLinkedPages(
+  sourceType: NodeType,
+  sourceId: string,
+  pageIds: string[],
+): Promise<void> {
+  const unique = Array.from(new Set(pageIds.filter(Boolean)));
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(links)
+      .where(
+        and(
+          eq(links.sourceType, sourceType),
+          eq(links.sourceId, sourceId),
+          eq(links.targetType, "page"),
+        ),
+      );
+    if (unique.length > 0) {
+      await tx
+        .insert(links)
+        .values(
+          unique.map((targetId) => ({
+            sourceType,
+            sourceId,
+            targetType: "page" as const,
+            targetId,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+  });
 }
 
 /**
@@ -129,8 +204,12 @@ export async function getBacklinks(
   const pageIds = rows.filter((r) => r.sourceType === "page").map((r) => r.sourceId);
   const postIds = rows.filter((r) => r.sourceType === "post").map((r) => r.sourceId);
   const taskIds = rows.filter((r) => r.sourceType === "task").map((r) => r.sourceId);
+  const modelIds = rows.filter((r) => r.sourceType === "model").map((r) => r.sourceId);
+  const sourceIds = rows
+    .filter((r) => r.sourceType === "source")
+    .map((r) => r.sourceId);
 
-  const [pageRows, postRows, taskRows] = await Promise.all([
+  const [pageRows, postRows, taskRows, modelRows, sourceRows] = await Promise.all([
     pageIds.length
       ? db
           .select({
@@ -168,6 +247,26 @@ export async function getBacklinks(
           .innerJoin(caseStudies, eq(caseStudies.id, caseStudyTasks.caseStudyId))
           .where(inArray(caseStudyTasks.id, taskIds))
       : Promise.resolve([]),
+    modelIds.length
+      ? db
+          .select({
+            id: models.id,
+            name: models.name,
+            visibility: models.visibility,
+          })
+          .from(models)
+          .where(inArray(models.id, modelIds))
+      : Promise.resolve([]),
+    sourceIds.length
+      ? db
+          .select({
+            id: sources.id,
+            name: sources.name,
+            visibility: sources.visibility,
+          })
+          .from(sources)
+          .where(inArray(sources.id, sourceIds))
+      : Promise.resolve([]),
   ]);
 
   const out: Backlink[] = [];
@@ -204,6 +303,28 @@ export async function getBacklinks(
         sourceId: r.sourceId,
         title: `${t.title} · ${t.caseName}`,
         href: `/case-studies/${t.caseSlug}/${t.taskSlug}`,
+        context: r.context,
+      });
+    } else if (r.sourceType === "model") {
+      const m = modelRows.find((x) => x.id === r.sourceId);
+      if (!m) continue;
+      if (!includePrivate && m.visibility === "private") continue;
+      out.push({
+        sourceType: "model",
+        sourceId: r.sourceId,
+        title: m.name,
+        href: nodeHref("model", m.id),
+        context: r.context,
+      });
+    } else if (r.sourceType === "source") {
+      const s = sourceRows.find((x) => x.id === r.sourceId);
+      if (!s) continue;
+      if (!includePrivate && s.visibility === "private") continue;
+      out.push({
+        sourceType: "source",
+        sourceId: r.sourceId,
+        title: s.name,
+        href: nodeHref("source", s.id),
         context: r.context,
       });
     }
