@@ -43,10 +43,16 @@ There are three things to set up, in order:
 
 Easiest path (no local tooling) — **Supabase SQL Editor**:
 
-1. SQL Editor → New query → paste the entire contents of
-   [`drizzle/0000_init.sql`](../drizzle/0000_init.sql) → **Run**.
+1. SQL Editor → New query → run **every** file in `drizzle/` in order
+   (`0000_init.sql`, then `0001_case_studies.sql`, …).
 2. New query → paste [`supabase/policies.sql`](../supabase/policies.sql) → Run.
 3. New query → paste [`supabase/seed.sql`](../supabase/seed.sql) → Run.
+
+> **Updating an existing deployment?** When you pull changes that add a
+> migration, run the new `drizzle/NNNN_*.sql` file(s) and re-run
+> `supabase/policies.sql` (it's idempotent — safe to run again). The
+> case-studies feature, for example, needs `drizzle/0001_case_studies.sql`
+> plus the policies file (or just `supabase/policies_case_studies.sql`).
 
 Or from your machine (needs `DATABASE_URL` in `.env.local`, using the **direct**
 `5432` connection):

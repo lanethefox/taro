@@ -3,7 +3,14 @@ import "server-only";
 import { and, eq, inArray, or } from "drizzle-orm";
 
 import { db } from "@/db";
-import { links, pages, posts, type NodeType } from "@/db/schema";
+import {
+  caseStudies,
+  caseStudyTasks,
+  links,
+  pages,
+  posts,
+  type NodeType,
+} from "@/db/schema";
 import { extractWikilinkTitles, type JSONContent } from "@/lib/content";
 import { resolveOrCreatePageByTitle } from "@/db/queries/pages";
 
@@ -26,6 +33,8 @@ export function nodeHref(
       return `/wiki/${slug}`;
     case "post":
       return kind === "decision" ? `/decisions/${slug}` : `/blog/${slug}`;
+    case "case_study":
+      return `/case-studies/${slug}`;
     default:
       return "#";
   }
@@ -119,8 +128,9 @@ export async function getBacklinks(
 
   const pageIds = rows.filter((r) => r.sourceType === "page").map((r) => r.sourceId);
   const postIds = rows.filter((r) => r.sourceType === "post").map((r) => r.sourceId);
+  const taskIds = rows.filter((r) => r.sourceType === "task").map((r) => r.sourceId);
 
-  const [pageRows, postRows] = await Promise.all([
+  const [pageRows, postRows, taskRows] = await Promise.all([
     pageIds.length
       ? db
           .select({
@@ -143,6 +153,20 @@ export async function getBacklinks(
           })
           .from(posts)
           .where(inArray(posts.id, postIds))
+      : Promise.resolve([]),
+    taskIds.length
+      ? db
+          .select({
+            id: caseStudyTasks.id,
+            title: caseStudyTasks.title,
+            taskSlug: caseStudyTasks.slug,
+            caseSlug: caseStudies.slug,
+            caseName: caseStudies.name,
+            visibility: caseStudies.visibility,
+          })
+          .from(caseStudyTasks)
+          .innerJoin(caseStudies, eq(caseStudies.id, caseStudyTasks.caseStudyId))
+          .where(inArray(caseStudyTasks.id, taskIds))
       : Promise.resolve([]),
   ]);
 
@@ -169,6 +193,17 @@ export async function getBacklinks(
         sourceId: r.sourceId,
         title: p.title,
         href: nodeHref("post", p.slug, p.kind),
+        context: r.context,
+      });
+    } else if (r.sourceType === "task") {
+      const t = taskRows.find((x) => x.id === r.sourceId);
+      if (!t) continue;
+      if (!includePrivate && t.visibility === "private") continue;
+      out.push({
+        sourceType: "task",
+        sourceId: r.sourceId,
+        title: `${t.title} · ${t.caseName}`,
+        href: `/case-studies/${t.caseSlug}/${t.taskSlug}`,
         context: r.context,
       });
     }

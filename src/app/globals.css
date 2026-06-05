@@ -46,75 +46,91 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Dorfromantik accent palette — exposed as utilities (bg-sage, text-wheat…) */
+  --color-sage: var(--sage);
+  --color-terracotta: var(--terracotta);
+  --color-wheat: var(--wheat);
+  --color-slate: var(--slate);
 }
 
+/* ---- Dorfromantik: cozy tile-builder (light) ---- */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --background: #f4eee2; /* parchment */
+  --foreground: #3d3528; /* ink */
+  --card: #fbf6ec;
+  --card-foreground: #3d3528;
+  --popover: #fbf6ec;
+  --popover-foreground: #3d3528;
+  --primary: #5e7a52; /* deep sage */
+  --primary-foreground: #f7f2e7;
+  --secondary: #ece3d2;
+  --secondary-foreground: #3d3528;
+  --muted: #ece3d2;
+  --muted-foreground: #7a6f5c;
+  --accent: #e7dcc6;
+  --accent-foreground: #3d3528;
+  --destructive: #b4513a; /* terracotta-red */
+  --border: #ddd2bd;
+  --input: #ddd2bd;
+  --ring: #7c9a6d;
+  --chart-1: #7c9a6d;
+  --chart-2: #c8794b;
+  --chart-3: #e0b341;
+  --chart-4: #5b8aa6;
+  --chart-5: #9a7aa6;
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: #efe6d4;
+  --sidebar-foreground: #3d3528;
+  --sidebar-primary: #5e7a52;
+  --sidebar-primary-foreground: #f7f2e7;
+  --sidebar-accent: #e3d7c0;
+  --sidebar-accent-foreground: #3d3528;
+  --sidebar-border: #ddd2bd;
+  --sidebar-ring: #7c9a6d;
+  /* named accents */
+  --sage: #7c9a6d;
+  --terracotta: #c8794b;
+  --wheat: #e0b341;
+  --slate: #5b8aa6;
 }
 
+/* ---- Dorfromantik (dusk / dark) ---- */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #211d17;
+  --foreground: #ede6d6;
+  --card: #2a251d;
+  --card-foreground: #ede6d6;
+  --popover: #2a251d;
+  --popover-foreground: #ede6d6;
+  --primary: #8fae7f;
+  --primary-foreground: #1b180f;
+  --secondary: #322b21;
+  --secondary-foreground: #ede6d6;
+  --muted: #322b21;
+  --muted-foreground: #b6a98f;
+  --accent: #3a3226;
+  --accent-foreground: #ede6d6;
+  --destructive: #d2735a;
+  --border: #3e3527;
+  --input: #3e3527;
+  --ring: #8fae7f;
+  --chart-1: #8fae7f;
+  --chart-2: #d68a5c;
+  --chart-3: #e6c25f;
+  --chart-4: #74a0bb;
+  --chart-5: #b394bf;
+  --sidebar: #26211a;
+  --sidebar-foreground: #ede6d6;
+  --sidebar-primary: #8fae7f;
+  --sidebar-primary-foreground: #1b180f;
+  --sidebar-accent: #342d22;
+  --sidebar-accent-foreground: #ede6d6;
+  --sidebar-border: #3e3527;
+  --sidebar-ring: #8fae7f;
+  --sage: #8fae7f;
+  --terracotta: #d68a5c;
+  --wheat: #e6c25f;
+  --slate: #74a0bb;
 }
 
 @layer base {
@@ -189,4 +205,41 @@
 }
 .wikilink--unresolved {
   @apply bg-destructive/10 text-destructive hover:bg-destructive/20;
+}
+
+/* ---------------------------------------------------------------------------
+   Cozy tile-builder flourishes (Dorfromantik)
+--------------------------------------------------------------------------- */
+
+/* Faint paper grain over the parchment background. */
+.bg-grain {
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/></svg>");
+}
+
+/* A placed-tile card: soft, tactile, slightly raised. */
+.tile {
+  @apply rounded-xl border bg-card;
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--foreground) 8%, transparent),
+    0 2px 8px color-mix(in oklab, var(--foreground) 5%, transparent);
+}
+.tile-interactive {
+  @apply transition-all duration-150;
+}
+.tile-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 2px 4px color-mix(in oklab, var(--foreground) 10%, transparent),
+    0 6px 16px color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+
+/* A completed tile reads as "settled into the landscape". */
+.tile-done {
+  background-image: linear-gradient(
+    to bottom right,
+    color-mix(in oklab, var(--sage) 18%, var(--card)),
+    var(--card)
+  );
+  border-color: color-mix(in oklab, var(--sage) 45%, var(--border));
 }

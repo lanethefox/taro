@@ -74,6 +74,8 @@ alter table public.diagram_nodes       enable row level security;
 alter table public.diagram_edges       enable row level security;
 alter table public.attachments         enable row level security;
 alter table public.revisions           enable row level security;
+alter table public.case_studies        enable row level security;
+alter table public.case_study_tasks    enable row level security;
 
 -- ----------------------------------------------------------------------------
 -- profiles
@@ -285,3 +287,29 @@ create policy revisions_owner_all on public.revisions
 drop policy if exists revisions_read on public.revisions;
 create policy revisions_read on public.revisions
   for select to authenticated using (true);
+
+-- ----------------------------------------------------------------------------
+-- Case studies: owner writes; SELECT by visibility. Tasks inherit the study.
+-- ----------------------------------------------------------------------------
+
+drop policy if exists case_studies_owner_all on public.case_studies;
+create policy case_studies_owner_all on public.case_studies
+  for all to authenticated
+  using (public.taro_is_owner()) with check (public.taro_is_owner());
+drop policy if exists case_studies_read on public.case_studies;
+create policy case_studies_read on public.case_studies
+  for select using (public.taro_can_read_visibility(visibility));
+
+drop policy if exists case_study_tasks_owner_all on public.case_study_tasks;
+create policy case_study_tasks_owner_all on public.case_study_tasks
+  for all to authenticated
+  using (public.taro_is_owner()) with check (public.taro_is_owner());
+drop policy if exists case_study_tasks_read on public.case_study_tasks;
+create policy case_study_tasks_read on public.case_study_tasks
+  for select using (
+    exists (
+      select 1 from public.case_studies c
+      where c.id = case_study_id
+        and public.taro_can_read_visibility(c.visibility)
+    )
+  );

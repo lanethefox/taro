@@ -55,8 +55,23 @@ out in M1 (remaining slices) – M3.
 - [x] **LinkedIn export** — post → clean Markdown / plain text (route + copy menu)
 - [x] Strategy-library Concept pages seeded (M0)
 
+## Case Studies (interactive, gamified)
+
+A practice surface where the theory in Concept pages gets built end-to-end.
+Each **case study** (ClassDojo is the first scenario) seeds a gap-free
+**curriculum** — 9 technical + 8 business/stakeholder tasks — and every task is
+an **editor workspace** that links back to the relevant Concept pages (so those
+pages show the case-study tasks in their backlinks). Completion is tracked with
+cozy progress rings and "tiles filling in"; finishing the baseline unlocks a
+**Room for improvement** log. Styled after *Dorfromantik* — warm parchment,
+sage/terracotta/wheat, tactile tiles.
+
+> Adds tables `case_studies` + `case_study_tasks` (migration
+> `drizzle/0001_case_studies.sql`) and `node_type` gains `case_study` / `task`.
+> Apply that migration + `supabase/policies_case_studies.sql` on existing DBs.
+
 Next: **M2 — Catalog** (models / sources / columns / tests, lineage graph,
-observation metadata), after a polish pass.
+observation metadata).
 
 ## Getting started
 

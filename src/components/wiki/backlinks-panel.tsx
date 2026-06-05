@@ -26,9 +26,9 @@ export function BacklinksPanel({ backlinks }: { backlinks: Backlink[] }) {
                 href={b.href}
                 className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
               >
-                {b.sourceType === "post" ? (
+                {b.sourceType !== "page" ? (
                   <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                    post
+                    {b.sourceType === "task" ? "case study" : b.sourceType}
                   </span>
                 ) : null}
                 {b.title}

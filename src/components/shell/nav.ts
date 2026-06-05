@@ -1,6 +1,7 @@
 import {
   BookOpen,
   Boxes,
+  Compass,
   GitBranch,
   Network,
   PenLine,
@@ -32,6 +33,10 @@ export const navSections: NavSection[] = [
       { label: "Decisions", href: "/decisions", icon: ScrollText },
       { label: "Tags", href: "/tags", icon: Tag },
     ],
+  },
+  {
+    title: "Practice",
+    items: [{ label: "Case Studies", href: "/case-studies", icon: Compass }],
   },
   {
     title: "Catalog",
