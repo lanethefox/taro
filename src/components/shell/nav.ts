@@ -1,0 +1,59 @@
+import {
+  BookOpen,
+  Boxes,
+  GitBranch,
+  Network,
+  PenLine,
+  ScrollText,
+  Search,
+  type LucideIcon,
+} from "lucide-react";
+
+export type NavItem = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  /** Match nested routes (e.g. /catalog/lineage under /catalog). */
+  match?: (pathname: string) => boolean;
+};
+
+export type NavSection = {
+  title: string;
+  items: NavItem[];
+};
+
+export const navSections: NavSection[] = [
+  {
+    title: "Knowledge",
+    items: [
+      { label: "Wiki", href: "/wiki", icon: BookOpen },
+      { label: "Blog", href: "/blog", icon: PenLine },
+      { label: "Decisions", href: "/decisions", icon: ScrollText },
+    ],
+  },
+  {
+    title: "Catalog",
+    items: [
+      {
+        label: "Models & Sources",
+        href: "/catalog",
+        icon: Boxes,
+        match: (p) => p.startsWith("/catalog") && !p.startsWith("/catalog/lineage"),
+      },
+      { label: "Lineage", href: "/catalog/lineage", icon: GitBranch },
+    ],
+  },
+  {
+    title: "Design",
+    items: [
+      { label: "ERD", href: "/erd", icon: Network },
+      { label: "Search", href: "/search", icon: Search },
+    ],
+  },
+];
+
+export function isActive(item: NavItem, pathname: string): boolean {
+  if (item.match) return item.match(pathname);
+  if (item.href === "/wiki" && pathname === "/") return true;
+  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+}
