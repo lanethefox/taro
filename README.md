@@ -36,8 +36,20 @@ makes taro more than four separate tools.
 - [x] RLS policies for owner / viewer / public (`supabase/policies.sql`)
 - [x] Strategy-library Concept page seed (`supabase/seed.sql`)
 
-Surfaces (wiki, blog, decisions, catalog, ERD, search) render as placeholders
-that get built out in M1–M3.
+Blog, decisions, catalog, ERD, and search render as placeholders that get built
+out in M1 (remaining slices) – M3.
+
+## Status — Milestone M1 (Knowledge core), slice 1
+
+- [x] TipTap block editor (headings, lists, code blocks, quotes) with a toolbar
+- [x] Custom **`[[wikilink]]`** extension — typing `[[Title]]` creates a link
+      token; on save the server resolves titles to pages and writes `links` rows
+      (red links auto-create stub pages so the graph stays connected)
+- [x] Pages: tree (via `parent_id`) + create / edit / delete, slugged routes,
+      reader + inline editor, visibility control
+- [x] **Backlinks panel** ("referenced by") on every page
+- [ ] Next slices: posts + decision records · tags + FTS/trigram search ·
+      LinkedIn export
 
 ## Getting started
 

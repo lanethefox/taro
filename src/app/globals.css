@@ -128,3 +128,65 @@
     @apply font-sans;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Editor & rendered content (TipTap). Reading typography lives here so we
+   don't depend on the typography plugin; SPEC §7 calls for clean reading type.
+--------------------------------------------------------------------------- */
+.tiptap {
+  @apply text-[0.95rem] leading-7 text-foreground;
+}
+.tiptap:focus {
+  @apply outline-none;
+}
+.tiptap > * + * {
+  @apply mt-4;
+}
+.tiptap h1 {
+  @apply mt-8 text-3xl font-semibold tracking-tight;
+}
+.tiptap h2 {
+  @apply mt-8 text-2xl font-semibold tracking-tight;
+}
+.tiptap h3 {
+  @apply mt-6 text-xl font-semibold tracking-tight;
+}
+.tiptap p {
+  @apply leading-7;
+}
+.tiptap ul {
+  @apply list-disc space-y-1 pl-6;
+}
+.tiptap ol {
+  @apply list-decimal space-y-1 pl-6;
+}
+.tiptap li > ul,
+.tiptap li > ol {
+  @apply mt-1;
+}
+.tiptap blockquote {
+  @apply border-l-2 border-border pl-4 text-muted-foreground italic;
+}
+.tiptap code {
+  @apply rounded bg-muted px-1.5 py-0.5 font-mono text-[0.85em];
+}
+.tiptap pre {
+  @apply overflow-x-auto rounded-lg bg-muted p-4 font-mono text-sm;
+}
+.tiptap pre code {
+  @apply bg-transparent p-0 text-[0.85rem];
+}
+.tiptap hr {
+  @apply my-6 border-t;
+}
+.tiptap a {
+  @apply text-primary underline underline-offset-2;
+}
+
+/* [[wikilink]] tokens */
+.wikilink {
+  @apply cursor-pointer rounded bg-primary/10 px-1 py-0.5 font-medium text-primary no-underline hover:bg-primary/20;
+}
+.wikilink--unresolved {
+  @apply bg-destructive/10 text-destructive hover:bg-destructive/20;
+}
