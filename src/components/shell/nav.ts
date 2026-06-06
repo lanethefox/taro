@@ -3,6 +3,7 @@ import {
   Boxes,
   Compass,
   GitBranch,
+  Library,
   Network,
   PenLine,
   ScrollText,
@@ -32,6 +33,7 @@ export const navSections: NavSection[] = [
     title: "Knowledge",
     items: [
       { label: "Wiki", href: "/wiki", icon: BookOpen },
+      { label: "Glossary", href: "/glossary", icon: Library },
       { label: "Blog", href: "/blog", icon: PenLine },
       { label: "Decisions", href: "/decisions", icon: ScrollText },
       { label: "Tags", href: "/tags", icon: Tag },

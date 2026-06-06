@@ -163,14 +163,14 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
 
 ### M2.5 — Semantic layer (new)
 > Where coherence becomes a feature (Principles 2, 5). Pulled forward from polish.
-- [ ] **"How taro thinks"** explainer page (in-app surface of the core concept;
-      copy drafted in `DESIGN-PRINCIPLES.md` → *The idea, in plain terms*).
-- [ ] **Glossary** surface: concepts as canonical definitions, each with
-      *defined here* + *used by* (graph-wide backlinks).
-- [ ] Catalog nodes (models / sources / columns) + concept definitions are
-      **searchable** (extend FTS/trigram beyond pages/posts).
-- [ ] Coherence nudges (non-blocking): offer to link a term that has a concept;
-      flag near-duplicate concept titles.
+- [x] **"How taro thinks"** explainer page (`/about`).
+- [x] **Glossary** surface (`/glossary`): concepts as canonical definitions, each
+      with a *used by* count (graph-wide backlinks).
+- [x] Catalog nodes (models / sources / columns) + concept definitions are
+      **searchable** (trigram/ILIKE added beyond pages/posts FTS).
+- [~] Coherence nudges: near-duplicate concept flag on the glossary
+      (`src/lib/coherence.ts`) done; the editor "offer to link a term" nudge is a
+      follow-up.
 
 ### M3 — ERD designer
 - [x] React Flow canvas; table nodes render columns + keys from catalog models.
