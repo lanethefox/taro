@@ -35,10 +35,14 @@ stays as-is; the principle-driven additions land next.
   `globals.css`.
 - **M2 — Catalog** — in progress. **Done:** models/sources/columns CRUD
   (per-node detail + editor, inline column tests, PK/FK flags, observation
-  metadata) and concept↔catalog linking (a "Related concepts" picker writes
-  `links` rows; catalog refs show in a concept's backlinks, both directions).
-  **Remaining:** lineage graph (React Flow over `model_dependencies`),
-  relationships UI. Then M3 ERD, M4 polish.
+  metadata), concept↔catalog linking (a "Related concepts" picker writes
+  `links` rows; catalog refs show in a concept's backlinks, both directions),
+  **grain on sources + definition-led readers/editors** (slice 1), and
+  **decision↔node links** (slice 2 — a model/source picks the decisions that
+  shaped it; they surface in the decision's "Referenced by"). **Remaining:**
+  lineage graph (React Flow over `model_dependencies`), relationships UI, plus
+  the M2.5 semantic-layer thread (Glossary, "How taro thinks" page,
+  catalog/concepts in search). Then M3 ERD, M4 polish.
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want

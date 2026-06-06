@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Trash2, X } from "lucide-react";
+import { Save, ScrollText, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteSourceAction, saveSourceAction } from "@/app/(app)/catalog/actions";
@@ -37,6 +37,8 @@ export function SourceEditor({
   initialColumns,
   conceptOptions,
   initialConceptIds,
+  decisionOptions,
+  initialDecisionIds,
 }: {
   id: string;
   initialName: string;
@@ -50,6 +52,8 @@ export function SourceEditor({
   initialColumns: ColumnDraft[];
   conceptOptions: ConceptOption[];
   initialConceptIds: string[];
+  decisionOptions: ConceptOption[];
+  initialDecisionIds: string[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
@@ -62,6 +66,7 @@ export function SourceEditor({
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
   const [columns, setColumns] = useState<ColumnDraft[]>(initialColumns);
   const [conceptIds, setConceptIds] = useState<string[]>(initialConceptIds);
+  const [decisionIds, setDecisionIds] = useState<string[]>(initialDecisionIds);
   const [saving, startSaving] = useTransition();
   const [deleting, startDeleting] = useTransition();
 
@@ -90,6 +95,7 @@ export function SourceEditor({
             .filter(Boolean),
         })),
         conceptIds,
+        decisionIds,
       });
       if (res.ok) {
         toast.success("Saved");
@@ -227,6 +233,17 @@ export function SourceEditor({
           options={conceptOptions}
           selected={conceptIds}
           onChange={setConceptIds}
+        />
+      </div>
+
+      <div className="mb-6 rounded-lg border bg-card p-4">
+        <ConceptPicker
+          options={decisionOptions}
+          selected={decisionIds}
+          onChange={setDecisionIds}
+          title="Related decisions"
+          icon={ScrollText}
+          emptyHint="No decision records yet — write one in the decision log to capture the why."
         />
       </div>
     </div>

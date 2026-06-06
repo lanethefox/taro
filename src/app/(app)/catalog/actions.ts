@@ -16,7 +16,7 @@ import {
   updateSource,
 } from "@/db/queries/catalog";
 import { requireOwner } from "@/lib/auth";
-import { removeAllLinksFor, setLinkedPages } from "@/lib/links";
+import { removeAllLinksFor, setLinkedDecisions, setLinkedPages } from "@/lib/links";
 
 /* -------------------------------------------------------------------------- */
 /* Create (name-only, then redirect into the editor)                           */
@@ -82,6 +82,7 @@ const saveModelSchema = z.object({
   visibility: visibilitySchema,
   columns: z.array(columnSchema).default([]),
   conceptIds: z.array(z.string().uuid()).default([]),
+  decisionIds: z.array(z.string().uuid()).default([]),
 });
 
 const saveSourceSchema = z.object({
@@ -96,6 +97,7 @@ const saveSourceSchema = z.object({
   visibility: visibilitySchema,
   columns: z.array(columnSchema).default([]),
   conceptIds: z.array(z.string().uuid()).default([]),
+  decisionIds: z.array(z.string().uuid()).default([]),
 });
 
 export type SaveResult =
@@ -127,6 +129,7 @@ export async function saveModelAction(
 
   await reconcileColumns("model", model.id, d.columns);
   await setLinkedPages("model", model.id, d.conceptIds);
+  await setLinkedDecisions("model", model.id, d.decisionIds);
 
   revalidatePath("/catalog");
   revalidatePath(`/catalog/models/${model.id}`);
@@ -156,6 +159,7 @@ export async function saveSourceAction(
 
   await reconcileColumns("source", source.id, d.columns);
   await setLinkedPages("source", source.id, d.conceptIds);
+  await setLinkedDecisions("source", source.id, d.decisionIds);
 
   revalidatePath("/catalog");
   revalidatePath(`/catalog/sources/${source.id}`);
