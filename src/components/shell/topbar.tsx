@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import Link from "next/link";
 
+import { MobileNav } from "@/components/shell/mobile-nav";
 import { UserMenu } from "@/components/shell/user-menu";
 
 export function Topbar({
@@ -13,7 +14,8 @@ export function Topbar({
   role: string;
 }) {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur md:px-6">
+    <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-background/80 px-4 backdrop-blur md:gap-4 md:px-6">
+      <MobileNav />
       <Link
         href="/search"
         className="flex h-9 max-w-md flex-1 items-center gap-2 rounded-md border bg-muted/40 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted"
