@@ -60,6 +60,41 @@ function Track({
   );
 }
 
+/** Playful ClassDojo-brand banner shown only on the ClassDojo case study. */
+function ClassDojoBanner() {
+  return (
+    <div className="relative overflow-hidden border-b border-border bg-gradient-to-br from-primary to-[#3f9e7e] px-6 py-8 text-white">
+      <div className="mx-auto flex max-w-5xl items-center gap-4">
+        {/* Mojo-style monster */}
+        <svg
+          width="56"
+          height="56"
+          viewBox="0 0 64 64"
+          fill="none"
+          className="shrink-0 drop-shadow"
+          aria-hidden
+        >
+          <path d="M18 6l3 7 5-6 4 7 4-7 5 6 3-7" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <rect x="12" y="12" width="40" height="40" rx="16" fill="#ffffff" />
+          <circle cx="25" cy="30" r="6" fill="#2d2b3a" />
+          <circle cx="39" cy="30" r="6" fill="#2d2b3a" />
+          <circle cx="27" cy="28" r="2" fill="#ffffff" />
+          <circle cx="41" cy="28" r="2" fill="#ffffff" />
+          <path d="M24 40c2.5 3 13.5 3 16 0" stroke="#2d2b3a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        </svg>
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
+            ClassDojo · Analytics Engineering Case Study
+          </div>
+          <div className="text-2xl font-extrabold tracking-tight">
+            Modeling the warehouse beneath the Weekly Business Review
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default async function CaseStudyBoard({
   params,
 }: {
@@ -79,9 +114,12 @@ export default async function CaseStudyBoard({
   const business = tasks.filter((t) => t.kind === "baseline" && t.track === "business");
   const improvements = tasks.filter((t) => t.kind === "improvement");
   const complete = progress.overall.total > 0 && progress.overall.done === progress.overall.total;
+  const themed = cs.slug === "classdojo";
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-8">
+    <div className={themed ? "theme-classdojo min-h-full bg-background" : undefined}>
+      {themed ? <ClassDojoBanner /> : null}
+      <div className="mx-auto max-w-5xl px-6 py-8">
       <Link
         href="/case-studies"
         className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -187,6 +225,7 @@ export default async function CaseStudyBoard({
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }

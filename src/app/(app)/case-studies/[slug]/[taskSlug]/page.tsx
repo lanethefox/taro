@@ -41,6 +41,7 @@ export default async function TaskPage({
   const ctx = await getSessionContext();
   const owner = isOwner(ctx);
   if (!owner && cs.visibility === "private") notFound();
+  const themed = cs.slug === "classdojo";
 
   const task = await getTaskBySlug(cs.id, taskSlug);
   if (!task) notFound();
@@ -55,7 +56,7 @@ export default async function TaskPage({
 
   if (owner) {
     return (
-      <div>
+      <div className={themed ? "theme-classdojo min-h-full bg-background" : undefined}>
         <div className="mx-auto max-w-3xl px-6 pt-6">
           <Link
             href={`/case-studies/${cs.slug}`}
@@ -80,6 +81,7 @@ export default async function TaskPage({
 
   // Read-only (viewer)
   return (
+    <div className={themed ? "theme-classdojo min-h-full bg-background" : undefined}>
     <article className="mx-auto max-w-3xl px-6 py-8">
       <Link
         href={`/case-studies/${cs.slug}`}
@@ -101,5 +103,6 @@ export default async function TaskPage({
       </div>
       <ContentView content={task.content as JSONContent | null} linkMap={linkMap} />
     </article>
+    </div>
   );
 }
