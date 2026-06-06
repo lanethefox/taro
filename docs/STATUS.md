@@ -61,9 +61,20 @@ stays as-is; the principle-driven additions land next.
   `read only` transaction with a 15s `statement_timeout` + 500-row cap) and
   **GraphQL** (Supabase pg_graphql endpoint via the service key). Runner in
   `src/lib/query/run.ts`, actions in `src/app/(app)/query/actions.ts`.
-- **Remaining:** M2.5 semantic-layer thread (Glossary, "How taro thinks",
-  catalog/concepts in search); M4 polish. Then materialize the ClassDojo case
-  study into the catalog/ERD (deferred build-out).
+- **M2.5 semantic layer** — done. "How taro thinks" (`/about`); **Glossary**
+  (`/glossary`) listing concepts + "used by" counts with a near-duplicate
+  coherence nudge (`src/lib/coherence.ts`); **search extended** to catalog
+  models/sources/columns (concepts already covered as pages). Follow-up: the
+  editor-time "link this term to its concept" nudge.
+- **M4 polish (partial)** — done: **command palette** (⌘K, `command-palette.tsx`,
+  search + nav), **machine-readable context bundle** (`/api/context`,
+  `src/db/queries/context.ts`), **light/dark toggle** (topbar + pre-paint script
+  in root layout). **Remaining M4:** `revisions` history (needs a table +
+  migration) and per-post **public sharing** (needs an unauthed route / proxy
+  allowance).
+- **Remaining:** finish M4 (revisions, public post sharing); then materialize
+  the ClassDojo case study into the catalog/ERD (deferred build-out) — which
+  lights up lineage/ERD/graph/context-bundle with real nodes.
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want
