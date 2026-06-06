@@ -173,11 +173,14 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
       flag near-duplicate concept titles.
 
 ### M3 — ERD designer
-- [ ] React Flow canvas; table nodes render columns + keys from catalog models.
-- [ ] `relationships` with cardinality (1:1/1:N/N:N) + join columns as edges.
-- [ ] Per-diagram layout persistence (`diagram_nodes` positions/sizes).
-- [ ] Edits on canvas write through to catalog (single source of truth).
-- [ ] Exports: PNG/SVG, **DBML**, **SQL DDL**, **dbt `schema.yml`**.
+- [x] React Flow canvas; table nodes render columns + keys from catalog models.
+- [x] `relationships` with cardinality (1:1/1:N/N:N) + join columns as edges.
+      (Drawn column→column; cardinality defaults to 1:N — an inline per-edge
+      cardinality switcher is a small follow-up.)
+- [x] Per-diagram layout persistence (`diagram_nodes` positions/sizes).
+- [x] Edits on canvas write through to catalog (single source of truth).
+- [~] Exports: **DBML**, **SQL DDL**, **dbt `schema.yml`** done; PNG/SVG pending
+      (needs a render dep — deferred).
 
 ### M4 — Polish & demo
 - [ ] Command-palette global search/navigation (over the whole graph, incl.

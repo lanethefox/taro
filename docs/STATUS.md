@@ -42,9 +42,20 @@ stays as-is; the principle-driven additions land next.
   shaped it; they surface in the decision's "Referenced by"), and the
   **lineage graph** (React Flow DAG over `model_dependencies`, longest-path
   layered layout; pure layout in `src/lib/graph/dag-layout.ts`, shared
-  `ModelNode` in `src/components/graph/`). **Remaining:** relationships UI, plus
-  the M2.5 semantic-layer thread (Glossary, "How taro thinks" page,
-  catalog/concepts in search). Then M3 ERD, M4 polish.
+  `ModelNode` in `src/components/graph/`).
+- **M3 — ERD designer** — done. React Flow canvas of catalog models as table
+  nodes (columns + PK/FK), first-class `relationships` as labeled edges drawn
+  column→column, per-diagram layout persistence (`diagram_nodes`), write-through
+  to the catalog, and **DBML / SQL DDL / dbt `schema.yml` exports**
+  (`/api/export/erd/[id]`; pure serializers in `src/lib/graph/erd-export.ts`).
+  Routes: `/erd` (list) + `/erd/[diagramId]`. Follow-ups: PNG/SVG export and an
+  inline per-edge cardinality switcher (defaults 1:N).
+- **ClassDojo theme** — done. Scoped `.theme-classdojo` palette skins the
+  ClassDojo case study (board + task pages) in CD brand.
+- **Remaining:** M2.5 semantic-layer thread (Glossary, "How taro thinks",
+  catalog/concepts in search); a **whole-graph viewer**; a **query editor**
+  (SQL + GraphQL, owner-only); M4 polish. Then materialize the ClassDojo case
+  study into the catalog/ERD (deferred build-out).
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want
