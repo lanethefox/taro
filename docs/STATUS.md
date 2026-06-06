@@ -72,9 +72,19 @@ stays as-is; the principle-driven additions land next.
   in root layout). **Remaining M4:** `revisions` history (needs a table +
   migration) and per-post **public sharing** (needs an unauthed route / proxy
   allowance).
-- **Remaining:** finish M4 (revisions, public post sharing); then materialize
-  the ClassDojo case study into the catalog/ERD (deferred build-out) — which
-  lights up lineage/ERD/graph/context-bundle with real nodes.
+- **ClassDojo warehouse materialized** — the deferred build-out is done. The
+  catalog now holds the full CD warehouse: **7 sources, 36 models** (staging →
+  intermediate → marts: dims/facts/bridges/WBR) with grain + materialization,
+  **87 columns** (PK/FK + tests on the marts), **48 lineage dependencies**, **25
+  relationships** (column-resolved), a saved **"ClassDojo warehouse" ERD**
+  diagram (18 nodes + 25 edges), and 7 model→concept links. So `/catalog`,
+  `/catalog/lineage`, `/erd`, `/graph`, `/api/context` and search now render
+  real nodes. Inserted via the Supabase MCP (`private` visibility — owner-only
+  until published). Generators in `/tmp` (not committed).
+- **Remaining:** finish M4 — `revisions` history (needs a table + migration) and
+  per-post **public sharing** (needs an unauthed route / proxy allowance). Also:
+  Vercel production auto-deploy from the prod branch isn't firing (dashboard
+  setting).
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want
