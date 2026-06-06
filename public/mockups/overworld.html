@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>taro — The Overworld Map (mockup 02)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#e9e0cb;--ink:#3d3528;--card:#fbf6ec;--muted:#ece3d2;--mut-fg:#7a6f5c;--border:#ddd2bd;
+    --primary:#5e7a52;--sage:#7c9a6d;--terra:#c8794b;--wheat:#e0b341;--slate:#5b8aa6;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Hanken Grotesk",system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden}
+  .ribbon{position:fixed;top:0;right:0;z-index:60;background:#b4513a;color:#fff;font-size:11px;font-weight:700;
+    letter-spacing:.08em;padding:6px 14px;border-bottom-left-radius:10px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .stage{position:relative;width:100%;min-height:100vh}
+  svg.map{display:block;width:100%;height:auto}
+  .hud{position:absolute;font-family:"Fredoka",sans-serif}
+  /* top-left region */
+  .region{top:18px;left:18px;background:rgba(251,246,236,.92);border:2px solid var(--ink);border-radius:14px;
+    padding:12px 16px;box-shadow:0 4px 14px rgba(61,53,40,.18);backdrop-filter:blur(2px);min-width:230px}
+  .region .lbl{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut-fg);font-weight:600}
+  .region h1{font-family:"Fredoka",sans-serif;font-size:22px;font-weight:700;display:flex;align-items:center;gap:8px;margin-top:1px}
+  .disc{margin-top:9px}
+  .disc .row{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;margin-bottom:4px}
+  .dbar{height:12px;border-radius:7px;background:var(--muted);border:1.5px solid var(--ink);overflow:hidden}
+  .dbar i{display:block;height:100%;width:75%;background:repeating-linear-gradient(45deg,#7c9a6d 0 7px,#8fb07e 7px 14px)}
+  /* compass + zoom top-right */
+  .tools{top:18px;right:18px;display:flex;flex-direction:column;gap:10px;align-items:flex-end}
+  .compass{width:62px;height:62px;background:rgba(251,246,236,.92);border:2px solid var(--ink);border-radius:50%;
+    box-shadow:0 4px 12px rgba(61,53,40,.18);display:flex;align-items:center;justify-content:center}
+  .zoom{display:flex;flex-direction:column;background:rgba(251,246,236,.92);border:2px solid var(--ink);border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(61,53,40,.18)}
+  .zoom button{border:0;background:transparent;font-size:20px;font-weight:700;width:40px;height:38px;cursor:pointer;color:var(--ink)}
+  .zoom button:first-child{border-bottom:1.5px solid var(--ink)}
+  /* legend bottom-left */
+  .legend{bottom:18px;left:18px;background:rgba(251,246,236,.92);border:2px solid var(--ink);border-radius:12px;
+    padding:11px 14px;box-shadow:0 4px 12px rgba(61,53,40,.18);font-size:12px;display:flex;flex-direction:column;gap:7px}
+  .legend .it{display:flex;align-items:center;gap:8px;font-weight:600}
+  .dot{width:13px;height:13px;border-radius:50%;border:1.5px solid var(--ink)}
+  /* location card right */
+  .loc{top:96px;right:18px;width:268px;background:rgba(251,246,236,.95);border:2px solid var(--ink);border-radius:16px;
+    box-shadow:0 8px 22px rgba(61,53,40,.22);overflow:hidden}
+  .loc .banner{background:linear-gradient(135deg,#7c9a6d,#5e7a52);padding:14px 16px;color:#f7f2e7;display:flex;align-items:center;gap:10px}
+  .loc .banner svg{filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+  .loc .banner h2{font-family:"Fredoka",sans-serif;font-size:18px;font-weight:700}
+  .loc .body{padding:14px 16px}
+  .loc .body p{font-size:13px;color:var(--mut-fg);line-height:1.5}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin:11px 0 13px}
+  .chip{font-size:10.5px;font-weight:700;letter-spacing:.04em;padding:4px 9px;border-radius:999px;border:1.5px solid var(--ink);background:#fff}
+  .chip.core{background:#dceae3}.chip.warn{background:#f6e6d6}
+  .travel{display:block;width:100%;text-align:center;font-family:"Fredoka",sans-serif;font-weight:700;font-size:14px;
+    background:var(--wheat);color:#3d3528;border:2px solid var(--ink);border-radius:10px;padding:9px;cursor:pointer;
+    box-shadow:0 3px 0 #b8902a;text-decoration:none}
+  .travel:active{transform:translateY(2px);box-shadow:0 1px 0 #b8902a}
+  /* minimap bottom-right */
+  .mini{bottom:18px;right:18px;width:140px;height:96px;background:rgba(251,246,236,.92);border:2px solid var(--ink);
+    border-radius:10px;box-shadow:0 4px 12px rgba(61,53,40,.18);overflow:hidden}
+  /* node labels rendered in foreignObject use this */
+  .nodeLabel{font-family:"Fredoka",sans-serif;font-weight:600;font-size:12px;color:#3d3528;background:rgba(251,246,236,.9);
+    padding:2px 8px;border-radius:8px;border:1.5px solid #3d3528;white-space:nowrap}
+  .nodeLabel.lock{color:#7a6f5c;border-color:#a99}
+  @media(max-width:760px){.loc{display:none}.mini{display:none}}
+</style>
+</head>
+<body>
+  <a class="ribbon" href="./index.html">◂ mockups</a>
+  <div class="stage">
+    <svg class="map" viewBox="0 0 960 620" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Knowledge overworld">
+      <defs>
+        <radialGradient id="sea" cx="50%" cy="40%" r="80%"><stop offset="0" stop-color="#cdd9e3"/><stop offset="1" stop-color="#b9c8d4"/></radialGradient>
+        <linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfdcbd"/><stop offset="1" stop-color="#bccfa6"/></linearGradient>
+        <pattern id="grid" width="34" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
+          <path d="M0 10 L17 0 L34 10 L17 20 Z" fill="none" stroke="#9db58a" stroke-width="0.6" opacity="0.5"/>
+        </pattern>
+        <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#3d3528" flood-opacity="0.25"/></filter>
+      </defs>
+
+      <!-- sea -->
+      <rect width="960" height="620" fill="url(#sea)"/>
+      <!-- subtle sea ripples -->
+      <g stroke="#aebecb" stroke-width="1.4" fill="none" opacity=".6">
+        <path d="M60 120q12-8 24 0t24 0"/><path d="M820 90q12-8 24 0t24 0"/><path d="M720 540q12-8 24 0t24 0"/>
+      </g>
+
+      <!-- landmass -->
+      <path filter="url(#soft)" d="M120 150 C170 90 300 70 410 96 C470 60 600 64 660 110 C780 90 880 150 870 250 C910 330 860 440 760 470 C720 540 600 560 520 528 C430 566 300 556 240 500 C120 480 70 380 110 300 C70 250 80 190 120 150 Z" fill="url(#land)" stroke="#8aa178" stroke-width="3"/>
+      <path d="M120 150 C170 90 300 70 410 96 C470 60 600 64 660 110 C780 90 880 150 870 250 C910 330 860 440 760 470 C720 540 600 560 520 528 C430 566 300 556 240 500 C120 480 70 380 110 300 C70 250 80 190 120 150 Z" fill="url(#grid)"/>
+
+      <!-- terrain doodads -->
+      <g stroke="#3d3528" stroke-width="1.2" stroke-linejoin="round">
+        <path d="M180 230 l14 24 h-28 Z" fill="#6f8f5f"/><path d="M198 244 l11 19 h-22 Z" fill="#7c9a6d"/>
+        <path d="M790 360 l14 24 h-28 Z" fill="#6f8f5f"/><path d="M808 374 l11 19 h-22 Z" fill="#7c9a6d"/>
+        <path d="M250 430 q20-18 40 0 q-20 10 -40 0Z" fill="#aebf8c"/>
+      </g>
+      <!-- river -->
+      <path d="M430 110 C400 200 470 250 440 330 C420 400 480 440 470 500" fill="none" stroke="#9fb9c9" stroke-width="9" stroke-linecap="round" opacity=".8"/>
+      <path d="M430 110 C400 200 470 250 440 330 C420 400 480 440 470 500" fill="none" stroke="#bcd2df" stroke-width="4" stroke-linecap="round"/>
+
+      <!-- PATHS between nodes -->
+      <g fill="none" stroke="#9a7d56" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="2 9" opacity=".85">
+        <path d="M470 175 C400 210 360 240 330 285"/>   <!-- capital -> grain -->
+        <path d="M470 175 C560 200 600 235 640 280"/>   <!-- capital -> semantics -->
+        <path d="M330 285 C320 350 340 390 380 430"/>   <!-- grain -> relationships -->
+        <path d="M640 280 C640 350 600 400 540 430"/>   <!-- semantics -> materialization -->
+        <path d="M540 430 C470 470 430 470 380 430" />  <!-- materialization -> relationships -->
+        <path d="M640 280 C720 300 760 340 760 380" stroke-dasharray="2 11" opacity=".5"/> <!-- -> locked -->
+      </g>
+
+      <!-- NODES -->
+      <!-- capital -->
+      <g filter="url(#soft)">
+        <circle cx="470" cy="160" r="26" fill="#5e7a52" stroke="#3d3528" stroke-width="3"/>
+        <path d="M470 146 l4 8 9 1-6.5 6 1.5 9-8-4.5-8 4.5 1.5-9-6.5-6 9-1 4-8Z" fill="#e0b341" stroke="#3d3528" stroke-width="1"/>
+      </g>
+      <foreignObject x="408" y="190" width="124" height="30"><div xmlns="http://www.w3.org/1999/xhtml" class="nodeLabel" style="font-size:13px;font-weight:700">⚑ Data Modeling</div></foreignObject>
+
+      <!-- grain (selected) -->
+      <g filter="url(#soft)">
+        <circle cx="330" cy="285" r="22" fill="#fbf6ec" stroke="#7c9a6d" stroke-width="4"/>
+        <rect x="321" y="276" width="18" height="16" rx="2" fill="#cfe0c2" stroke="#3d3528" stroke-width="1.3"/><path d="M321 281h18M330 276v16" stroke="#3d3528" stroke-width="1"/>
+        <circle cx="330" cy="285" r="29" fill="none" stroke="#e0b341" stroke-width="2.5" stroke-dasharray="4 4"/>
+      </g>
+      <foreignObject x="286" y="312" width="90" height="26"><div xmlns="http://www.w3.org/1999/xhtml" class="nodeLabel">Grain</div></foreignObject>
+
+      <!-- semantics -->
+      <g filter="url(#soft)">
+        <circle cx="640" cy="280" r="22" fill="#fbf6ec" stroke="#5b8aa6" stroke-width="4"/>
+        <circle cx="640" cy="280" r="9" fill="#cdddE8" stroke="#3d3528" stroke-width="1.3"/><path d="M636 280h8M640 276v8" stroke="#3d3528" stroke-width="1.1"/>
+      </g>
+      <foreignObject x="586" y="307" width="120" height="26"><div xmlns="http://www.w3.org/1999/xhtml" class="nodeLabel">Semantics</div></foreignObject>
+
+      <!-- relationships -->
+      <g filter="url(#soft)">
+        <circle cx="380" cy="430" r="20" fill="#fbf6ec" stroke="#7c9a6d" stroke-width="4"/>
+        <circle cx="373" cy="430" r="4.5" fill="none" stroke="#3d3528" stroke-width="1.4"/><circle cx="388" cy="430" r="4.5" fill="none" stroke="#3d3528" stroke-width="1.4"/><path d="M377 430h6" stroke="#3d3528" stroke-width="1.4"/>
+      </g>
+      <foreignObject x="332" y="455" width="100" height="26"><div xmlns="http://www.w3.org/1999/xhtml" class="nodeLabel">Relationships</div></foreignObject>
+
+      <!-- materialization (practice) -->
+      <g filter="url(#soft)">
+        <circle cx="540" cy="430" r="20" fill="#fbf6ec" stroke="#c8794b" stroke-width="4"/>
+        <path d="M532 425h16M532 430h16M532 435h10" stroke="#c8794b" stroke-width="2" stroke-linecap="round"/>
+      </g>
+      <foreignObject x="486" y="455" width="120" height="26"><div xmlns="http://www.w3.org/1999/xhtml" class="nodeLabel">Materialization</div></foreignObject>
+
+      <!-- locked / fogged -->
+      <g opacity=".75">
+        <circle cx="760" cy="380" r="20" fill="#cfc6b4" stroke="#8a8270" stroke-width="3" stroke-dasharray="3 3"/>
+        <rect x="753" y="378" width="14" height="9" rx="2" fill="#8a8270"/><path d="M755 378v-2a5 5 0 0110 0v2" stroke="#8a8270" stroke-width="2" fill="none"/>
+      </g>
+      <foreignObject x="710" y="404" width="118" height="26"><div xmlns="http://www.w3.org/1999/xhtml" class="nodeLabel lock">??? · undiscovered</div></foreignObject>
+
+      <!-- a couple of distant fogged regions -->
+      <g opacity=".5" font-family="Fredoka" >
+        <text x="150" y="120" font-size="13" fill="#5e6f7d">~ Catalog Coast ~</text>
+        <text x="690" y="540" font-size="13" fill="#5e6f7d">~ ERD Isles ~</text>
+      </g>
+    </svg>
+
+    <!-- HUD overlays -->
+    <div class="hud region">
+      <div class="lbl">Current Region</div>
+      <h1>⚑ Data Modeling</h1>
+      <div class="disc">
+        <div class="row"><span>Discovered</span><span>15 / 20 locations</span></div>
+        <div class="dbar"><i></i></div>
+      </div>
+    </div>
+
+    <div class="hud tools">
+      <div class="compass">
+        <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="#3d3528" stroke-width="1.5"/><path d="M20 6 l4 14 -4 4 -4-4Z" fill="#b4513a"/><path d="M20 34 l4-14 -4 -4 -4 4Z" fill="#5b8aa6"/><text x="20" y="11" font-size="6" text-anchor="middle" fill="#3d3528" font-family="Fredoka">N</text></svg>
+      </div>
+      <div class="zoom"><button>+</button><button>−</button></div>
+    </div>
+
+    <div class="hud legend">
+      <div class="it"><span class="dot" style="background:#5e7a52"></span> Capital (domain)</div>
+      <div class="it"><span class="dot" style="background:#7c9a6d"></span> Core fundamental</div>
+      <div class="it"><span class="dot" style="background:#c8794b"></span> Practice strategy</div>
+      <div class="it"><span class="dot" style="background:#cfc6b4;border-style:dashed"></span> Undiscovered</div>
+    </div>
+
+    <div class="hud loc">
+      <div class="banner">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" fill="#cfe0c2" stroke="#1b2a18" stroke-width="1.4"/><path d="M4 10h16M10 5v14" stroke="#1b2a18" stroke-width="1.1"/></svg>
+        <h2>Grain</h2>
+      </div>
+      <div class="body">
+        <div class="meta"><span class="chip core">Core fundamental</span><span class="chip warn">8 paths out</span></div>
+        <p>“What does one row mean?” The keystone location — most roads in this region pass through it. Master it to unlock the Materialization frontier.</p>
+        <a class="travel" href="#">✦ Travel here</a>
+      </div>
+    </div>
+
+    <div class="hud mini">
+      <svg viewBox="0 0 140 96" width="140" height="96"><rect width="140" height="96" fill="#b9c8d4"/><path d="M22 30 C40 16 78 18 96 28 C118 24 128 44 122 60 C110 80 60 84 40 74 C18 70 12 46 22 30Z" fill="#bccfa6" stroke="#8aa178"/><rect x="58" y="20" width="34" height="22" fill="none" stroke="#b4513a" stroke-width="2"/><circle cx="68" cy="44" r="2.5" fill="#5e7a52"/><circle cx="50" cy="46" r="2" fill="#7c9a6d"/><circle cx="92" cy="44" r="2" fill="#5b8aa6"/></svg>
+    </div>
+  </div>
+</body>
+</html>
