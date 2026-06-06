@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>taro — The Skill Tree (mockup 03)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#211d17;--ink:#ede6d6;--card:#2a251d;--muted:#322b21;--mut-fg:#b6a98f;--border:#3e3527;
+    --sage:#8fae7f;--terra:#d68a5c;--wheat:#e6c25f;--slate:#74a0bb;--purple:#b394bf;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Hanken Grotesk",system-ui,sans-serif;color:var(--ink);background:var(--bg);min-height:100vh;
+    background-image:radial-gradient(circle at 30% 0%,#2c271e,#211d17 60%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/></svg>");}
+  .pixel{font-family:"Press Start 2P",monospace}
+  .ribbon{position:fixed;top:0;right:0;z-index:60;background:#d2735a;color:#1b180f;font-size:11px;font-weight:700;
+    letter-spacing:.06em;padding:6px 14px;border-bottom-left-radius:10px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+  /* HUD top bar */
+  .hud{display:flex;align-items:center;gap:18px;padding:16px 24px;border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,#2a251d,#231e17);position:sticky;top:0;z-index:30}
+  .av{width:50px;height:50px;border-radius:12px;border:2px solid var(--wheat);flex:none;
+    background:radial-gradient(circle at 50% 35%,#a9c098,#5e7a52);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 0 14px rgba(230,194,95,.4)}
+  .av span{font-family:"Press Start 2P",monospace;font-size:16px;color:#1b180f}
+  .who .nm{font-weight:800;font-size:15px}
+  .who .pixel{font-size:8px;color:var(--mut-fg);margin-top:5px;letter-spacing:.05em}
+  .xpwrap{flex:1;max-width:340px}
+  .xprow{display:flex;justify-content:space-between;font-size:8px;margin-bottom:5px;color:var(--mut-fg)}
+  .xpbar{height:14px;border-radius:7px;background:#1b180f;border:1px solid var(--border);overflow:hidden;position:relative}
+  .xpbar i{position:absolute;inset:0;width:68%;background:linear-gradient(90deg,#8fae7f,#b6d0a3);box-shadow:0 0 12px rgba(143,174,127,.7)}
+  .hudright{margin-left:auto;display:flex;gap:12px;align-items:center}
+  .sp{display:flex;align-items:center;gap:8px;border:1px solid var(--wheat);border-radius:10px;padding:8px 12px;
+    background:rgba(230,194,95,.08);box-shadow:0 0 12px rgba(230,194,95,.18)}
+  .sp .pixel{font-size:9px;color:var(--wheat)}
+  /* tier rails */
+  .scene{display:flex;gap:0;justify-content:center}
+  .canvas{position:relative;width:780px;height:560px;margin:18px;flex:none}
+  @media(max-width:1180px){.scene{overflow-x:auto;justify-content:flex-start}}
+  .tier{position:absolute;left:0;right:0;display:flex;align-items:center;gap:10px;opacity:.5}
+  .tier .pixel{font-size:8px;color:var(--mut-fg);white-space:nowrap}
+  .tier .ln{flex:1;height:1px;background:repeating-linear-gradient(90deg,var(--border) 0 6px,transparent 6px 12px)}
+  svg.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .node{position:absolute;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:16px;
+    display:flex;align-items:center;justify-content:center;border:2px solid var(--border);background:var(--card);
+    cursor:pointer;transition:transform .15s}
+  .node:hover{transform:translate(-50%,-50%) scale(1.07)}
+  .node .lvl{position:absolute;top:-9px;right:-9px;font-family:"Press Start 2P",monospace;font-size:7px;
+    background:#1b180f;border:1px solid var(--border);border-radius:6px;padding:3px 4px}
+  .label{position:absolute;transform:translate(-50%,0);top:46px;white-space:nowrap;font-size:11px;font-weight:700;text-align:center;left:50%}
+  .label small{display:block;font-family:"Press Start 2P",monospace;font-size:6px;font-weight:400;color:var(--mut-fg);margin-top:4px;letter-spacing:.04em}
+  /* states */
+  .mastered{border-color:var(--wheat);box-shadow:0 0 16px rgba(230,194,95,.55);background:radial-gradient(circle at 50% 35%,#3a3020,#2a251d)}
+  .mastered .lvl{color:var(--wheat);border-color:var(--wheat)}
+  .unlocked{border-color:var(--sage);box-shadow:0 0 14px rgba(143,174,127,.45)}
+  .unlocked .lvl{color:var(--sage);border-color:var(--sage)}
+  .avail{border-color:var(--slate);border-style:dashed;box-shadow:0 0 10px rgba(116,160,187,.3);animation:pulse 2.2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(116,160,187,.25)}50%{box-shadow:0 0 18px rgba(116,160,187,.6)}}
+  .locked{opacity:.45;filter:grayscale(.6)}
+  .selected{outline:2px solid var(--wheat);outline-offset:4px}
+  /* side detail */
+  .layout{display:flex;gap:8px;max-width:1180px;margin:0 auto;flex-wrap:wrap}
+  .detail{flex:1;min-width:260px;max-width:320px;margin:18px;align-self:flex-start;background:var(--card);
+    border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .detail .hd{padding:16px;background:radial-gradient(circle at 50% 0%,#3a3020,#2a251d);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .detail .hd .ic{width:46px;height:46px;border-radius:12px;border:2px solid var(--wheat);display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(230,194,95,.5)}
+  .detail h2{font-size:18px;font-weight:800}
+  .detail .st{font-family:"Press Start 2P",monospace;font-size:7px;color:var(--wheat);margin-top:6px;letter-spacing:.05em}
+  .detail .bd{padding:16px}
+  .detail .bd p{font-size:13px;color:var(--mut-fg);line-height:1.55}
+  .unlocks{margin-top:14px}
+  .unlocks .h{font-family:"Press Start 2P",monospace;font-size:7px;color:var(--mut-fg);margin-bottom:9px}
+  .unlocks .u{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;padding:6px 0;border-top:1px dashed var(--border)}
+  .ubtn{margin-top:16px;display:block;text-align:center;font-family:"Press Start 2P",monospace;font-size:9px;
+    background:var(--wheat);color:#1b180f;border:0;border-radius:10px;padding:12px;cursor:pointer;text-decoration:none;
+    box-shadow:0 4px 0 #b8902a}
+  .ubtn:active{transform:translateY(3px);box-shadow:0 1px 0 #b8902a}
+  .intro{max-width:1180px;margin:18px auto 0;padding:0 26px}
+  .intro h1{font-size:20px;font-weight:800;display:flex;align-items:center;gap:10px}
+  .intro p{color:var(--mut-fg);font-size:13.5px;margin-top:6px;max-width:560px}
+</style>
+</head>
+<body>
+  <a class="ribbon" href="./index.html">◂ mockups</a>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="av"><span>L</span></div>
+    <div class="who"><div class="nm">Lane</div><div class="pixel">ANALYTICS ENGINEER · LV 7</div></div>
+    <div class="xpwrap"><div class="xprow pixel"><span>XP</span><span>3400 / 5000</span></div><div class="xpbar"><i></i></div></div>
+    <div class="hudright">
+      <div class="sp"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 16.5 7.1 21.1l.9-5.5-4-3.9 5.5-.8L12 3Z" fill="#e6c25f"/></svg><span class="pixel">3 SP</span></div>
+    </div>
+  </div>
+
+  <div class="intro">
+    <h1>⌬ Skill Tree — Analytics Engineering</h1>
+    <p>Spend skill points to unlock concepts. Master a node to light its branches and open the next tier. You have <strong>3 unspent points</strong>.</p>
+  </div>
+
+  <div class="layout">
+    <div class="scene">
+      <div class="canvas">
+        <!-- tier rails -->
+        <div class="tier" style="top:60px"><span class="pixel">TIER&nbsp;I · ROOT</span><span class="ln"></span></div>
+        <div class="tier" style="top:185px"><span class="pixel">TIER&nbsp;II · FUNDAMENTALS</span><span class="ln"></span></div>
+        <div class="tier" style="top:320px"><span class="pixel">TIER&nbsp;III · APPLIED</span><span class="ln"></span></div>
+        <div class="tier" style="top:455px"><span class="pixel">TIER&nbsp;IV · PRACTICE</span><span class="ln"></span></div>
+
+        <!-- wires -->
+        <svg class="wires" viewBox="0 0 780 560" preserveAspectRatio="none">
+          <defs>
+            <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g fill="none" stroke-width="3" filter="url(#glow)">
+            <!-- lit (mastered/unlocked) -->
+            <path d="M390 60 L200 185" stroke="#e6c25f" opacity=".8"/>
+            <path d="M390 60 L390 185" stroke="#8fae7f" opacity=".7"/>
+            <path d="M390 60 L580 185" stroke="#8fae7f" opacity=".7"/>
+            <path d="M200 185 L120 320" stroke="#8fae7f" opacity=".55"/>
+            <path d="M200 185 L300 320" stroke="#e6c25f" opacity=".7"/>
+            <path d="M390 185 L470 320" stroke="#74a0bb" opacity=".5" stroke-dasharray="5 6"/>
+            <path d="M580 185 L630 320" stroke="#74a0bb" opacity=".5" stroke-dasharray="5 6"/>
+            <!-- dim (locked) -->
+            <path d="M300 320 L520 455" stroke="#5a5346" opacity=".5" stroke-dasharray="4 7"/>
+            <path d="M630 320 L660 455" stroke="#5a5346" opacity=".5" stroke-dasharray="4 7"/>
+          </g>
+        </svg>
+
+        <!-- NODES -->
+        <!-- root -->
+        <div class="node mastered" style="left:390px;top:60px"><span class="lvl">MAX</span>
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7l8-4Z" fill="#e6c25f" stroke="#1b180f" stroke-width="1.3"/><path d="M9 12l2 2 4-4" stroke="#1b180f" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="label">Data Modeling<small>MASTERED</small></div>
+        </div>
+        <!-- grain (selected, mastered) -->
+        <div class="node mastered selected" style="left:200px;top:185px"><span class="lvl">5/5</span>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" fill="#e6c25f" stroke="#1b180f" stroke-width="1.3"/><path d="M4 10h16M10 5v14" stroke="#1b180f" stroke-width="1"/></svg>
+          <div class="label">Grain<small>MASTERED</small></div>
+        </div>
+        <!-- semantics unlocked -->
+        <div class="node unlocked" style="left:390px;top:185px"><span class="lvl">3/5</span>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" fill="none" stroke="#8fae7f" stroke-width="1.6"/><path d="M8 12h8M12 8v8" stroke="#8fae7f" stroke-width="1.8"/></svg>
+          <div class="label">Semantics<small>LV 3</small></div>
+        </div>
+        <!-- relationships unlocked -->
+        <div class="node unlocked" style="left:580px;top:185px"><span class="lvl">2/5</span>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="12" r="4" fill="none" stroke="#8fae7f" stroke-width="1.6"/><circle cx="16" cy="12" r="4" fill="none" stroke="#8fae7f" stroke-width="1.6"/></svg>
+          <div class="label">Relationships<small>LV 2</small></div>
+        </div>
+        <!-- time available -->
+        <div class="node avail" style="left:120px;top:320px"><span class="lvl">+</span>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" fill="none" stroke="#74a0bb" stroke-width="1.6"/><path d="M12 8v4l3 2" stroke="#74a0bb" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <div class="label">Time<small>UNLOCK · 1 SP</small></div>
+        </div>
+        <!-- counting mastered -->
+        <div class="node mastered" style="left:300px;top:320px"><span class="lvl">5/5</span>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M6 18V8M12 18V5M18 18v-7" stroke="#e6c25f" stroke-width="2.4" stroke-linecap="round"/></svg>
+          <div class="label">Counting<small>MASTERED</small></div>
+        </div>
+        <!-- perspectives available -->
+        <div class="node avail" style="left:470px;top:320px"><span class="lvl">+</span>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12Z" fill="none" stroke="#74a0bb" stroke-width="1.6"/><circle cx="12" cy="12" r="2.4" fill="#74a0bb"/></svg>
+          <div class="label">Perspectives<small>UNLOCK · 1 SP</small></div>
+        </div>
+        <!-- materialization available -->
+        <div class="node avail" style="left:630px;top:320px"><span class="lvl">+</span>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M6 7h12M6 12h12M6 17h7" stroke="#74a0bb" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <div class="label">Materialization<small>UNLOCK · 1 SP</small></div>
+        </div>
+        <!-- observation locked -->
+        <div class="node locked" style="left:520px;top:455px"><span class="lvl">🔒</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" fill="#b6a98f"/><path d="M2 12s4-6 10-6 10 6 10 6" stroke="#b6a98f" stroke-width="1.6" fill="none"/></svg>
+          <div class="label">Observation<small>LOCKED</small></div>
+        </div>
+        <!-- ml/ai locked -->
+        <div class="node locked" style="left:660px;top:455px"><span class="lvl">🔒</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 4l7 4v8l-7 4-7-4V8l7-4Z" fill="none" stroke="#b6a98f" stroke-width="1.5"/></svg>
+          <div class="label">ML / AI<small>LOCKED</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- detail panel -->
+    <aside class="detail">
+      <div class="hd">
+        <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" fill="#e6c25f" stroke="#1b180f" stroke-width="1.3"/><path d="M4 10h16M10 5v14" stroke="#1b180f" stroke-width="1"/></svg></div>
+        <div><h2>Grain</h2><div class="st">★ MASTERED · 5/5</div></div>
+      </div>
+      <div class="bd">
+        <p>The grain is what a single row represents. Get it right and every join, count, and metric downstream behaves. Get it wrong and nothing reconciles.</p>
+        <div class="unlocks">
+          <div class="h pixel">UNLOCKS</div>
+          <div class="u"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" fill="none" stroke="#74a0bb" stroke-width="1.6"/><path d="M12 8v4l3 2" stroke="#74a0bb" stroke-width="1.8" stroke-linecap="round"/></svg> Time in data modeling</div>
+          <div class="u"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 18V8M12 18V5M18 18v-7" stroke="#e6c25f" stroke-width="2.4" stroke-linecap="round"/></svg> Counting &amp; aggregation</div>
+        </div>
+        <a class="ubtn" href="#">▸ OPEN PAGE</a>
+      </div>
+    </aside>
+  </div>
+</body>
+</html>

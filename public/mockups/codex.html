@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>taro — The Adventurer’s Codex (mockup 01)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Cinzel:wght@600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f4eee2;--ink:#3d3528;--card:#fbf6ec;--muted:#ece3d2;--mut-fg:#7a6f5c;
+    --border:#ddd2bd;--primary:#5e7a52;--sage:#7c9a6d;--terra:#c8794b;--wheat:#e0b341;--slate:#5b8aa6;--red:#b4513a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Hanken Grotesk",system-ui,sans-serif;color:var(--ink);background:var(--bg);
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/></svg>");
+    line-height:1.5;padding-bottom:60px}
+  a{color:inherit}
+  .ribbon{position:fixed;top:0;right:0;z-index:50;background:var(--red);color:#fff;font-size:11px;font-weight:700;
+    letter-spacing:.08em;padding:6px 14px;border-bottom-left-radius:10px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  /* top banner */
+  .banner{display:flex;align-items:center;gap:16px;padding:18px 28px;border-bottom:2px solid var(--border);
+    background:linear-gradient(180deg,#f7f0e1,#efe6d4)}
+  .crest{width:44px;height:44px;flex:none;filter:drop-shadow(0 2px 3px rgba(61,53,40,.3))}
+  .bt h1{font-family:"Cinzel",serif;font-size:24px;font-weight:800;letter-spacing:.02em}
+  .bt p{font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--mut-fg)}
+  .gold{margin-left:auto;display:flex;align-items:center;gap:18px}
+  .coin{display:flex;align-items:center;gap:7px;font-weight:700;font-size:14px}
+  .coin svg{filter:drop-shadow(0 1px 1px rgba(61,53,40,.25))}
+  .layout{max-width:1180px;margin:0 auto;padding:26px 24px;display:grid;grid-template-columns:300px 1fr;gap:24px}
+  @media(max-width:880px){.layout{grid-template-columns:1fr}}
+  /* panel with corner brackets */
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:14px;position:relative;
+    box-shadow:0 1px 2px rgba(61,53,40,.08),0 4px 14px rgba(61,53,40,.06)}
+  .panel::before,.panel::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--terra);opacity:.5}
+  .panel::before{top:8px;left:8px;border-right:0;border-bottom:0;border-top-left-radius:4px}
+  .panel::after{bottom:8px;right:8px;border-left:0;border-top:0;border-bottom-right-radius:4px}
+  .phead{font-family:"Cinzel",serif;font-weight:700;font-size:14px;letter-spacing:.06em;text-transform:uppercase;
+    padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px}
+  .pbody{padding:18px}
+  /* character card */
+  .avatar{width:84px;height:84px;border-radius:50%;border:3px solid var(--wheat);background:
+    radial-gradient(circle at 50% 35%,#a9c098,#5e7a52);display:flex;align-items:center;justify-content:center;
+    margin:0 auto 12px;box-shadow:0 3px 10px rgba(61,53,40,.2)}
+  .avatar span{font-family:"Cinzel",serif;font-size:34px;color:#f7f2e7;font-weight:700}
+  .who{text-align:center}
+  .who .name{font-family:"Cinzel",serif;font-size:19px;font-weight:700}
+  .who .cls{font-size:12.5px;color:var(--mut-fg);margin-top:2px}
+  .lvbar{margin:16px 0 6px}
+  .lvbar .row{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px}
+  .xp{height:14px;border-radius:8px;background:var(--muted);border:1px solid var(--border);overflow:hidden;position:relative}
+  .xp i{position:absolute;inset:0;width:68%;background:linear-gradient(90deg,#7c9a6d,#9bb98a);
+    border-right:2px solid #4f6a45}
+  .xp.gold i{width:42%;background:linear-gradient(90deg,#e0b341,#edcb66);border-color:#b8902a}
+  .xpnote{font-size:11px;color:var(--mut-fg);text-align:right;margin-top:4px}
+  .stats{margin-top:18px;display:flex;flex-direction:column;gap:11px}
+  .stat .l{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;margin-bottom:4px}
+  .stat .l span:last-child{color:var(--mut-fg)}
+  .bar{height:8px;border-radius:5px;background:var(--muted);overflow:hidden}
+  .bar i{display:block;height:100%}
+  .badges{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+  .badge{width:42px;height:42px;border-radius:10px;border:1px solid var(--border);background:#fff8;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(61,53,40,.1)}
+  .badge.lock{opacity:.4;filter:grayscale(1)}
+  /* main */
+  .secthead{display:flex;align-items:center;gap:12px;margin:6px 2px 14px}
+  .secthead h2{font-family:"Cinzel",serif;font-size:19px;font-weight:700}
+  .secthead .line{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--border) 0 8px,transparent 8px 14px)}
+  .secthead .count{font-size:12px;color:var(--mut-fg);font-weight:600}
+  .quests{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.quests{grid-template-columns:1fr}}
+  .quest{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;
+    box-shadow:0 1px 2px rgba(61,53,40,.08),0 4px 12px rgba(61,53,40,.05);transition:transform .15s,box-shadow .15s}
+  .quest:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(61,53,40,.12),0 12px 26px rgba(61,53,40,.1)}
+  .quest .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .qtype{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--terra)}
+  .quest h3{font-family:"Cinzel",serif;font-size:16.5px;font-weight:700;margin:3px 0 8px}
+  .ring{width:46px;height:46px;flex:none}
+  .obj{list-style:none;display:flex;flex-direction:column;gap:6px;margin:10px 0 12px}
+  .obj li{display:flex;gap:8px;font-size:13px;color:var(--ink)}
+  .obj li.done{color:var(--mut-fg);text-decoration:line-through}
+  .check{flex:none;width:16px;height:16px;border-radius:5px;border:1.5px solid var(--sage);display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .check.on{background:var(--sage);border-color:var(--sage)}
+  .check.off{border-color:var(--border)}
+  .reward{display:flex;align-items:center;gap:10px;border-top:1px dashed var(--border);padding-top:11px;font-size:12.5px;font-weight:700}
+  .reward .xpr{color:var(--wheat)}.reward .gp{color:var(--terra);margin-left:auto}
+  /* codex grimoire list */
+  .grim{display:flex;flex-direction:column}
+  .gentry{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--border);transition:background .12s}
+  .gentry:last-child{border-bottom:0}
+  .gentry:hover{background:#fff8}
+  .gicon{width:38px;height:38px;flex:none;border-radius:9px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;background:#fff8}
+  .gentry .nm{font-weight:700;font-size:14.5px}
+  .gentry .ds{font-size:12.5px;color:var(--mut-fg)}
+  .rarity{margin-left:auto;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    padding:4px 9px;border-radius:999px;border:1px solid}
+  .r-core{color:var(--slate);border-color:color-mix(in srgb,var(--slate),#fff 55%);background:color-mix(in srgb,var(--slate),#fff 86%)}
+  .r-prac{color:var(--terra);border-color:color-mix(in srgb,var(--terra),#fff 55%);background:color-mix(in srgb,var(--terra),#fff 86%)}
+  .r-myth{color:#8a5fb0;border-color:#d7c3ea;background:#f3ecf8}
+  /* journal */
+  .jentry{display:flex;gap:14px;padding:14px 0;border-bottom:1px dashed var(--border)}
+  .jentry:last-child{border-bottom:0}
+  .seal{width:34px;height:34px;flex:none}
+  .jentry .dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut-fg);font-weight:700}
+  .jentry .ti{font-weight:700;font-size:14.5px;margin:1px 0 3px}
+  .jentry .ex{font-size:12.5px;color:var(--mut-fg)}
+  .col-gap{display:flex;flex-direction:column;gap:26px}
+</style>
+</head>
+<body>
+  <a class="ribbon" href="./index.html">◂ mockups</a>
+
+  <div class="banner">
+    <svg class="crest" viewBox="0 0 64 64" fill="none"><path d="M32 3 58 16v18c0 14-11 24-26 27C17 58 6 48 6 34V16L32 3Z" fill="#5e7a52" stroke="#3d3528" stroke-width="2"/><path d="M22 38c4-2 7-6 10-12 3 6 6 10 10 12-4 2-7 4-10 8-3-4-6-6-10-8Z" fill="#e0b341" stroke="#3d3528" stroke-width="1.5" stroke-linejoin="round"/></svg>
+    <div class="bt"><h1>The Adventurer’s Codex</h1><p>taro · analytics-engineering campaign</p></div>
+    <div class="gold">
+      <div class="coin" title="Streak"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2c1 4-2 5-2 8a4 4 0 008 0c0-2-1-3-1-3 3 2 4 5 4 8a7 7 0 11-14 0c0-5 4-7 5-13Z" fill="#c8794b" stroke="#3d3528" stroke-width="1.3"/></svg>12-day streak</div>
+      <div class="coin" title="Gold"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#e0b341" stroke="#3d3528" stroke-width="1.3"/><circle cx="12" cy="12" r="5" fill="none" stroke="#b8902a" stroke-width="1.3"/></svg>1,480</div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <!-- CHARACTER PANEL -->
+    <aside class="panel" style="align-self:start">
+      <div class="pbody">
+        <div class="avatar"><span>L</span></div>
+        <div class="who"><div class="name">Lane</div><div class="cls">Analytics Engineer · Lv 7</div></div>
+
+        <div class="lvbar">
+          <div class="row"><span>Level 7</span><span>Level 8</span></div>
+          <div class="xp"><i></i></div>
+          <div class="xpnote">3,400 / 5,000 XP to next level</div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="l"><span>Data Modeling</span><span>92</span></div><div class="bar"><i style="width:92%;background:linear-gradient(90deg,#7c9a6d,#9bb98a)"></i></div></div>
+          <div class="stat"><div class="l"><span>Semantics</span><span>78</span></div><div class="bar"><i style="width:78%;background:linear-gradient(90deg,#5b8aa6,#7baac5)"></i></div></div>
+          <div class="stat"><div class="l"><span>Pipelines</span><span>64</span></div><div class="bar"><i style="width:64%;background:linear-gradient(90deg,#c8794b,#dd9568)"></i></div></div>
+          <div class="stat"><div class="l"><span>Storytelling</span><span>71</span></div><div class="bar"><i style="width:71%;background:linear-gradient(90deg,#e0b341,#edcb66)"></i></div></div>
+        </div>
+
+        <div class="badges">
+          <div class="badge" title="First model shipped"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" fill="#7c9a6d" stroke="#3d3528" stroke-width="1.3"/><path d="M3 10h18M9 5v14" stroke="#3d3528" stroke-width="1.1"/></svg></div>
+          <div class="badge" title="Grain master"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#e0b341" stroke="#3d3528" stroke-width="1.3"/><circle cx="12" cy="12" r="2.4" fill="#3d3528"/></svg></div>
+          <div class="badge" title="100% case study"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 16.5 7.1 21.1l.9-5.5-4-3.9 5.5-.8L12 3Z" fill="#c8794b" stroke="#3d3528" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+          <div class="badge lock" title="Locked"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" fill="#7a6f5c"/><path d="M8 11V8a4 4 0 018 0v3" stroke="#7a6f5c" stroke-width="2"/></svg></div>
+          <div class="badge lock" title="Locked"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" fill="#7a6f5c"/><path d="M8 11V8a4 4 0 018 0v3" stroke="#7a6f5c" stroke-width="2"/></svg></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="col-gap">
+      <section>
+        <div class="secthead"><h2>Active Quests</h2><span class="line"></span><span class="count">2 in progress · 1 ready</span></div>
+        <div class="quests">
+          <article class="quest">
+            <div class="top">
+              <div><div class="qtype">⚔ Main Quest · Technical</div><h3>The Subscription Ledger</h3></div>
+              <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#ece3d2" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#7c9a6d" stroke-width="4" stroke-linecap="round" stroke-dasharray="97" stroke-dashoffset="33" transform="rotate(-90 18 18)"/><text x="18" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#3d3528">66%</text></svg>
+            </div>
+            <ul class="obj">
+              <li class="done"><span class="check on">✓</span> Define the grain of the events source</li>
+              <li class="done"><span class="check on">✓</span> Stage &amp; test the raw billing feed</li>
+              <li><span class="check off"></span> Build the monthly recurring-revenue mart</li>
+              <li><span class="check off"></span> Document the semantic definitions</li>
+            </ul>
+            <div class="reward"><span class="xpr">★ 850 XP</span><span class="gp">◉ 200 gold</span></div>
+          </article>
+
+          <article class="quest">
+            <div class="top">
+              <div><div class="qtype">⚔ Side Quest · Business</div><h3>Tell the Churn Story</h3></div>
+              <svg class="ring" viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.5" fill="none" stroke="#ece3d2" stroke-width="4"/><circle cx="18" cy="18" r="15.5" fill="none" stroke="#c8794b" stroke-width="4" stroke-linecap="round" stroke-dasharray="97" stroke-dashoffset="68" transform="rotate(-90 18 18)"/><text x="18" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#3d3528">30%</text></svg>
+            </div>
+            <ul class="obj">
+              <li class="done"><span class="check on">✓</span> Frame the business question</li>
+              <li><span class="check off"></span> Pick the metric &amp; its grain</li>
+              <li><span class="check off"></span> Draft the executive narrative</li>
+              <li><span class="check off"></span> Link the decision record</li>
+            </ul>
+            <div class="reward"><span class="xpr">★ 600 XP</span><span class="gp">◉ 150 gold</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <div class="secthead"><h2>The Codex</h2><span class="line"></span><span class="count">15 entries discovered</span></div>
+        <div class="panel grim">
+          <div class="gentry">
+            <div class="gicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" fill="#cfe0c2" stroke="#3d3528" stroke-width="1.3"/><path d="M4 10h16M10 5v14" stroke="#3d3528" stroke-width="1"/></svg></div>
+            <div><div class="nm">Grain</div><div class="ds">What one row means — the keystone of every model.</div></div>
+            <span class="rarity r-core">Core</span>
+          </div>
+          <div class="gentry">
+            <div class="gicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" fill="#cdddE8" stroke="#3d3528" stroke-width="1.3"/><path d="M8 12h8M12 8v8" stroke="#3d3528" stroke-width="1.2"/></svg></div>
+            <div><div class="nm">Semantics &amp; the semantic layer</div><div class="ds">The shared language that makes numbers mean the same thing.</div></div>
+            <span class="rarity r-core">Core</span>
+          </div>
+          <div class="gentry">
+            <div class="gicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M5 7h14M5 12h14M5 17h9" stroke="#c8794b" stroke-width="2" stroke-linecap="round"/></svg></div>
+            <div><div class="nm">Materialization strategies</div><div class="ds">View, table, incremental, ephemeral — and when each wins.</div></div>
+            <span class="rarity r-prac">Practice</span>
+          </div>
+          <div class="gentry">
+            <div class="gicon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 4v6c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V7l8-4Z" fill="#efe2f7" stroke="#8a5fb0" stroke-width="1.3"/></svg></div>
+            <div><div class="nm">ML / AI integration</div><div class="ds">Hand off marts to features, embeddings and LLM-assisted docs.</div></div>
+            <span class="rarity r-myth">Mythic</span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="secthead"><h2>Journal</h2><span class="line"></span><span class="count">recent decisions &amp; field notes</span></div>
+        <div class="panel"><div class="pbody">
+          <div class="jentry">
+            <svg class="seal" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#b4513a" stroke="#7d3527" stroke-width="2"/><path d="M20 11l2.6 5.2 5.7.8-4.1 4 1 5.7L20 29.8l-5.1 2.7 1-5.7-4.1-4 5.7-.8L20 11Z" fill="#e0b341" opacity=".85"/></svg>
+            <div><div class="dt">Decision · 4 Jun</div><div class="ti">Chose one-big-table for the revenue mart</div><div class="ex">Denormalized for BI ergonomics; documented the grain so the trade-off is legible to the next reader.</div></div>
+          </div>
+          <div class="jentry">
+            <svg class="seal" viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#5b8aa6" stroke="#3f6a83" stroke-width="2"/><path d="M14 20h12M20 14v12" stroke="#dff0fa" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <div><div class="dt">Field note · 2 Jun</div><div class="ti">Why freshness beats volume for alerting</div><div class="ex">A stale table lies quietly; a small one fails loudly. Observation strategy now leads with freshness SLAs.</div></div>
+          </div>
+        </div></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
