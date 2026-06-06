@@ -28,6 +28,31 @@ export async function listPages(): Promise<PageListItem[]> {
     .orderBy(asc(pages.title));
 }
 
+export type PageTreeItem = PageListItem & { text: string };
+
+/**
+ * Pages plus their flattened visible text — powers the skill-tree view, where a
+ * node's "mastery" is derived honestly from how much has actually been written.
+ */
+export async function listPagesForTree(): Promise<PageTreeItem[]> {
+  return db
+    .select({
+      id: pages.id,
+      title: pages.title,
+      slug: pages.slug,
+      parentId: pages.parentId,
+      kind: pages.kind,
+      visibility: pages.visibility,
+      updatedAt: pages.updatedAt,
+      text: sql<string>`coalesce((
+        select string_agg(t.v #>> '{}', ' ')
+        from jsonb_path_query(${pages.content}, '$.**?(@.type == "text").text') as t(v)
+      ), '')`,
+    })
+    .from(pages)
+    .orderBy(asc(pages.title));
+}
+
 export async function getPageBySlug(slug: string): Promise<Page | undefined> {
   const [row] = await db.select().from(pages).where(eq(pages.slug, slug)).limit(1);
   return row;

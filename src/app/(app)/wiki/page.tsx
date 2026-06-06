@@ -1,48 +1,29 @@
 import Link from "next/link";
-import { BookOpen, FileText, FolderTree, Hash, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
-import { listPages } from "@/db/queries/pages";
+import { listPagesForTree } from "@/db/queries/pages";
+import { listCaseStudiesWithProgress } from "@/db/queries/case-studies";
 import { getSessionContext, isOwner } from "@/lib/auth";
+import { buildSkillTree, computeHud, layoutTree } from "@/lib/skill-tree";
 import { Button } from "@/components/ui/button";
-import { buildTree } from "@/components/wiki/tree";
+import { SkillTree } from "@/components/wiki/skill-tree";
 
 export default async function WikiIndexPage() {
-  const [pages, ctx] = await Promise.all([listPages(), getSessionContext()]);
+  const [pages, ctx, caseStudies] = await Promise.all([
+    listPagesForTree(),
+    getSessionContext(),
+    listCaseStudiesWithProgress(),
+  ]);
   const owner = isOwner(ctx);
   const visible = owner ? pages : pages.filter((p) => p.visibility !== "private");
 
-  const recent = [...visible]
-    .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))
-    .slice(0, 12);
-  const tree = buildTree(visible);
-
-  return (
-    <div className="mx-auto max-w-3xl px-6 py-10">
-      <div className="mb-8 flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <BookOpen className="size-5" />
-          </span>
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Wiki</h1>
-            <p className="text-sm text-muted-foreground">
-              Your reference knowledge — linked into one graph.
-            </p>
-          </div>
-        </div>
-        {owner ? (
-          <Button render={<Link href="/wiki/new" />}>
-            <Plus className="size-4" />
-            New page
-          </Button>
-        ) : null}
-      </div>
-
-      {visible.length === 0 ? (
+  if (visible.length === 0) {
+    return (
+      <div className="mx-auto max-w-3xl px-6 py-10">
         <div className="rounded-lg border border-dashed p-10 text-center">
           <p className="text-sm text-muted-foreground">
             No pages yet.
-            {owner ? " Create your first one to get started." : ""}
+            {owner ? " Create your first one to grow the tree." : ""}
           </p>
           {owner ? (
             <Button className="mt-4" render={<Link href="/wiki/new" />}>
@@ -51,74 +32,48 @@ export default async function WikiIndexPage() {
             </Button>
           ) : null}
         </div>
-      ) : (
-        <div className="space-y-8">
-          <section>
-            <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-              Recently updated
-            </h2>
-            <ul className="divide-y rounded-lg border">
-              {recent.map((p) => (
-                <li key={p.id}>
-                  <Link
-                    href={`/wiki/${p.slug}`}
-                    className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50"
-                  >
-                    {p.kind === "concept" ? (
-                      <Hash className="size-4 shrink-0 text-primary/70" />
-                    ) : (
-                      <FileText className="size-4 shrink-0 text-muted-foreground" />
-                    )}
-                    <span className="truncate font-medium">{p.title}</span>
-                    <span className="ml-auto shrink-0 text-xs text-muted-foreground">
-                      {new Date(p.updatedAt).toLocaleDateString()}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+      </div>
+    );
+  }
 
-          {tree.map((root) => (
-            <section key={root.id}>
-              <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-                <Link
-                  href={`/wiki/${root.slug}`}
-                  className="inline-flex items-center gap-1.5 hover:text-foreground"
-                >
-                  <BookOpen className="size-4 text-primary/70" />
-                  {root.title}
-                </Link>
-              </h2>
-              {root.children.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {root.children.map((c) => (
-                    <Link
-                      key={c.id}
-                      href={`/wiki/${c.slug}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
-                      title={
-                        c.children.length > 0
-                          ? `${c.children.length} pages`
-                          : undefined
-                      }
-                    >
-                      {c.children.length > 0 ? (
-                        <FolderTree className="size-3.5 text-primary/70" />
-                      ) : c.kind === "concept" ? (
-                        <Hash className="size-3.5 text-primary/70" />
-                      ) : (
-                        <FileText className="size-3.5 text-muted-foreground" />
-                      )}
-                      {c.title}
-                    </Link>
-                  ))}
-                </div>
-              ) : null}
-            </section>
-          ))}
-        </div>
-      )}
-    </div>
+  const roots = buildSkillTree(
+    visible.map((p) => ({
+      id: p.id,
+      title: p.title,
+      slug: p.slug,
+      kind: p.kind,
+      parentId: p.parentId,
+      text: p.text,
+    })),
+  );
+  const layout = layoutTree(roots);
+
+  const pagesWritten = layout.nodes.filter((n) => n.state === "mastered").length;
+  const seedlings = layout.nodes.filter((n) => n.state === "seedling").length;
+
+  const csVisible = owner
+    ? caseStudies
+    : caseStudies.filter((c) => c.visibility !== "private");
+  const tasksDone = csVisible.reduce((a, c) => a + c.done, 0);
+  const tasksTotal = csVisible.reduce((a, c) => a + c.total, 0);
+
+  const hud = computeHud({
+    tasksDone,
+    tasksTotal,
+    pagesWritten,
+    pagesTotal: layout.nodes.length,
+    seedlings,
+  });
+
+  const initial =
+    (ctx?.profile.displayName ?? "").trim().charAt(0).toUpperCase() || "?";
+
+  return (
+    <SkillTree
+      layout={layout}
+      hud={hud}
+      ownerInitial={initial}
+      canCreate={owner}
+    />
   );
 }
