@@ -9,6 +9,7 @@ import {
   Search,
   Sparkles,
   Tag,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 
@@ -55,6 +56,7 @@ export const navSections: NavSection[] = [
     title: "Design",
     items: [
       { label: "ERD", href: "/erd", icon: Network },
+      { label: "Graph", href: "/graph", icon: Waypoints },
       { label: "Search", href: "/search", icon: Search },
     ],
   },

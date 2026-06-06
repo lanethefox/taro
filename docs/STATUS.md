@@ -52,10 +52,15 @@ stays as-is; the principle-driven additions land next.
   inline per-edge cardinality switcher (defaults 1:N).
 - **ClassDojo theme** — done. Scoped `.theme-classdojo` palette skins the
   ClassDojo case study (board + task pages) in CD brand.
-- **Remaining:** M2.5 semantic-layer thread (Glossary, "How taro thinks",
-  catalog/concepts in search); a **whole-graph viewer**; a **query editor**
-  (SQL + GraphQL, owner-only); M4 polish. Then materialize the ClassDojo case
-  study into the catalog/ERD (deferred build-out).
+- **Graph viewer** — done. `/graph` renders the whole linked graph (pages,
+  concepts, posts, models, sources, case studies, tasks as nodes; `links` rows
+  as edges) via a pure force-directed layout (`src/lib/graph/force-layout.ts`,
+  smoke-tested) over React Flow, colored by type with a legend; nodes link
+  through. Query: `getKnowledgeGraph` in `src/db/queries/graph.ts`.
+- **Remaining:** a **query editor** (SQL + GraphQL, owner-only); M2.5
+  semantic-layer thread (Glossary, "How taro thinks", catalog/concepts in
+  search); M4 polish. Then materialize the ClassDojo case study into the
+  catalog/ERD (deferred build-out).
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want
