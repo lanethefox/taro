@@ -57,10 +57,13 @@ stays as-is; the principle-driven additions land next.
   as edges) via a pure force-directed layout (`src/lib/graph/force-layout.ts`,
   smoke-tested) over React Flow, colored by type with a legend; nodes link
   through. Query: `getKnowledgeGraph` in `src/db/queries/graph.ts`.
-- **Remaining:** a **query editor** (SQL + GraphQL, owner-only); M2.5
-  semantic-layer thread (Glossary, "How taro thinks", catalog/concepts in
-  search); M4 polish. Then materialize the ClassDojo case study into the
-  catalog/ERD (deferred build-out).
+- **Query editor** — done. `/query` (owner-only) runs **read-only SQL** (in a
+  `read only` transaction with a 15s `statement_timeout` + 500-row cap) and
+  **GraphQL** (Supabase pg_graphql endpoint via the service key). Runner in
+  `src/lib/query/run.ts`, actions in `src/app/(app)/query/actions.ts`.
+- **Remaining:** M2.5 semantic-layer thread (Glossary, "How taro thinks",
+  catalog/concepts in search); M4 polish. Then materialize the ClassDojo case
+  study into the catalog/ERD (deferred build-out).
 
 ### Polish backlog (agreed, not yet done)
 - Export button uses a generic share icon (lucide v1 dropped brand icons) — want
