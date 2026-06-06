@@ -183,14 +183,17 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
       (needs a render dep — deferred).
 
 ### M4 — Polish & demo
-- [ ] Command-palette global search/navigation (over the whole graph, incl.
-      definitions).
-- [ ] **Machine-readable context bundle** — definitions + grain + relationships +
-      links as JSON, for agent/LLM consumption (Principle 5, north star).
-- [ ] `revisions` history for pages/posts.
-- [ ] Per-post public sharing (visibility flag + unauth render).
-- [ ] Light/dark theme + reading typography.
-- [ ] Deploy to Vercel; env vars set; custom domain (optional).
+- [x] Command-palette global search/navigation (⌘K) over the whole graph
+      (search results + nav destinations).
+- [x] **Machine-readable context bundle** — definitions + grain + structure +
+      relationships as JSON at `/api/context` (Principle 5, north star).
+- [ ] `revisions` history for pages/posts. (Needs a `revisions` table +
+      migration — not yet done.)
+- [ ] Per-post public sharing (visibility flag + unauth render). (Needs an
+      unauthed route / proxy allowance — not yet done.)
+- [x] Light/dark theme (toggle in the topbar; pre-paint no-flash script).
+- [x] Deployed to Vercel. (NB: production auto-deploy from the prod branch is
+      currently not firing — a Vercel dashboard setting; building is unaffected.)
 
 ---
 

@@ -78,6 +78,14 @@ export default function AboutPage() {
           answers in one walk of the graph — instead of a meeting.
         </p>
       </div>
+
+      <p className="mt-6 text-sm text-muted-foreground">
+        For machines:{" "}
+        <a href="/api/context" className="font-medium text-primary hover:underline">
+          the context bundle
+        </a>{" "}
+        — every definition, grain, and relationship as one JSON document.
+      </p>
     </div>
   );
 }
