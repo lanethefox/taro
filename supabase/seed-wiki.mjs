@@ -56,6 +56,7 @@ const pages = [
         "[[Entities, instances & identifiers]], [[Attributes]], and [[Relationships]].",
         "[[Grain]] and [[Counting & aggregation]].",
         "[[Time in data modeling]] and [[Semantics & the semantic layer]].",
+        "[[Modeling theory]] — dimensional, one-big-table, and normalization trade-offs.",
       ]),
       h("Putting it to work"),
       ul([
@@ -63,7 +64,7 @@ const pages = [
         "[[Seeing the business]] — processes, domains, and shared language.",
         "[[Data modeling as continuous practice]].",
       ]),
-      p("These connect to the strategy library: [[Modeling theory]], [[Materialization strategies]], [[Observation strategies]], [[Orchestration strategies]], [[Testing & data quality]], and [[ML / AI integration]]."),
+      p("Then put it to work in an analytics stack: [[Analytics engineering practice]] covers materialization, observation, orchestration, testing, and ML/AI integration."),
     ],
   },
   {
@@ -290,6 +291,34 @@ const pages = [
       p("See [[Why data modeling matters]] for the debt these create, and [[Grain]] and [[Counting & aggregation]] for where they bite hardest."),
     ],
   },
+  {
+    title: "Analytics engineering practice",
+    slug: "analytics-engineering-practice",
+    kind: "wiki",
+    parent: "data-modeling",
+    body: [
+      p("How the modeling fundamentals show up in an analytics-engineering stack — the strategies for building, observing, and orchestrating the analytics layer, and handing it off to ML and AI. (Formerly the standalone strategy library; now grounded in the fundamentals above.)"),
+      ul([
+        "[[Materialization strategies]] — view vs. table vs. incremental vs. ephemeral, and the cost/performance trade-offs.",
+        "[[Observation strategies]] — freshness, volume, distribution, anomalies, contracts, alerting.",
+        "[[Orchestration strategies]] — scheduling, dependency graphs, backfills, CI/CD for transformations.",
+        "[[Testing & data quality]] — test taxonomy, coverage, and contracts.",
+        "[[ML / AI integration]] — feature/marts hand-off, embeddings and vector stores, LLM-assisted docs and semantic search.",
+      ]),
+      p("These build on the fundamentals in [[Data modeling]] — especially [[Grain]], [[Semantics & the semantic layer]], and [[Time in data modeling]]."),
+    ],
+  },
+];
+
+// The strategy-library concepts seeded by supabase/seed.sql exist as top-level
+// pages; re-home them so the wiki is one tree (run seed.sql before this file).
+const reparent = [
+  { child: "modeling-theory", parent: "data-modeling" },
+  { child: "materialization-strategies", parent: "analytics-engineering-practice" },
+  { child: "observation-strategies", parent: "analytics-engineering-practice" },
+  { child: "orchestration-strategies", parent: "analytics-engineering-practice" },
+  { child: "testing-and-data-quality", parent: "analytics-engineering-practice" },
+  { child: "ml-ai-integration", parent: "analytics-engineering-practice" },
 ];
 
 /* ---- emit SQL ------------------------------------------------------------ */
@@ -308,7 +337,22 @@ const values = pages
   )
   .join(",\n");
 
-const childSlugs = pages.filter((p) => p.parent).map((p) => p.slug);
+// Every parent→children edge, from generator pages plus the re-homed concepts.
+const parentEdges = [
+  ...pages.filter((p) => p.parent).map((p) => ({ child: p.slug, parent: p.parent })),
+  ...reparent,
+];
+const byParent = new Map();
+for (const e of parentEdges) {
+  if (!byParent.has(e.parent)) byParent.set(e.parent, []);
+  byParent.get(e.parent).push(e.child);
+}
+const parentUpdates = [...byParent.entries()]
+  .map(
+    ([parent, children]) =>
+      `update public.pages c\n  set parent_id = p.id\n  from public.pages p\n  where p.slug = ${q(parent)}\n    and c.slug = any(${arr(children)});`,
+  )
+  .join("\n\n");
 
 const out = `-- ============================================================================
 -- taro — wiki seed: data-modeling reference pages (generated).
@@ -327,12 +371,9 @@ on conflict (slug) do update set
   content = excluded.content,
   updated_at = now();
 
--- Parent the building-block pages under the "Data modeling" index.
-update public.pages c
-  set parent_id = p.id
-  from public.pages p
-  where p.slug = ${q("data-modeling")}
-    and c.slug = any(${arr(childSlugs)});
+-- Re-home pages into one tree: fundamentals under "Data modeling", the
+-- analytics-engineering practice concepts under their hub.
+${parentUpdates}
 
 -- Re-derive page→page links straight from the embedded wikilinks, so the
 -- backlink graph matches the prose. Clear the seeded sources first for clean

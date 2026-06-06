@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { BookOpen, FileText, Hash, Plus } from "lucide-react";
+import { BookOpen, FileText, FolderTree, Hash, Plus } from "lucide-react";
 
 import { listPages } from "@/db/queries/pages";
 import { getSessionContext, isOwner } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
+import { buildTree } from "@/components/wiki/tree";
 
 export default async function WikiIndexPage() {
   const [pages, ctx] = await Promise.all([listPages(), getSessionContext()]);
@@ -13,7 +14,7 @@ export default async function WikiIndexPage() {
   const recent = [...visible]
     .sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt))
     .slice(0, 12);
-  const concepts = visible.filter((p) => p.kind === "concept");
+  const tree = buildTree(visible);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
@@ -78,25 +79,44 @@ export default async function WikiIndexPage() {
             </ul>
           </section>
 
-          {concepts.length > 0 ? (
-            <section>
+          {tree.map((root) => (
+            <section key={root.id}>
               <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-                Concept pages — strategy library
+                <Link
+                  href={`/wiki/${root.slug}`}
+                  className="inline-flex items-center gap-1.5 hover:text-foreground"
+                >
+                  <BookOpen className="size-4 text-primary/70" />
+                  {root.title}
+                </Link>
               </h2>
-              <div className="flex flex-wrap gap-2">
-                {concepts.map((p) => (
-                  <Link
-                    key={p.id}
-                    href={`/wiki/${p.slug}`}
-                    className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
-                  >
-                    <Hash className="size-3.5 text-primary/70" />
-                    {p.title}
-                  </Link>
-                ))}
-              </div>
+              {root.children.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {root.children.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={`/wiki/${c.slug}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
+                      title={
+                        c.children.length > 0
+                          ? `${c.children.length} pages`
+                          : undefined
+                      }
+                    >
+                      {c.children.length > 0 ? (
+                        <FolderTree className="size-3.5 text-primary/70" />
+                      ) : c.kind === "concept" ? (
+                        <Hash className="size-3.5 text-primary/70" />
+                      ) : (
+                        <FileText className="size-3.5 text-muted-foreground" />
+                      )}
+                      {c.title}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
             </section>
-          ) : null}
+          ))}
         </div>
       )}
     </div>
