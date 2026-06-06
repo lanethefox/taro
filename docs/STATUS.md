@@ -74,7 +74,12 @@ stays as-is; the principle-driven additions land next.
   applied to the live DB). The wiki is **one tree** rooted at `Data modeling`:
   ~14 fundamentals plus an `Analytics engineering practice` hub that re-homes
   the 6 strategy concepts (run `seed.sql` before `seed_wiki.sql`). The `/wiki`
-  index renders this hierarchy (no more flat "strategy library" dump).
+  index is a **skill-tree view** of this hierarchy (RPG reframe): nodes' mastery
+  is derived honestly from page content length (mastered/growing/unwritten),
+  branches follow the tree, and the dusk HUD shows level/XP/skill-points from
+  real case-study progress. Pure layout/state in `src/lib/skill-tree.ts`
+  (smoke-testable); UI in `src/components/wiki/skill-tree.tsx`. Static design
+  explorations live in `public/mockups/` (throwaway; remove once settled).
 - The agent has **no DB access from the sandbox** unless a Supabase MCP server
   or `DATABASE_URL` env secret is configured. Generate migrations with
   `pnpm drizzle-kit generate` (no DB needed); the user (or the Supabase MCP)
