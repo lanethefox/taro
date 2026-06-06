@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Database, Hash, Pencil } from "lucide-react";
+import { Database, Hash, Pencil, ScrollText } from "lucide-react";
 
 import { getSourceById, listColumns } from "@/db/queries/catalog";
 import { listPages } from "@/db/queries/pages";
+import { listPosts } from "@/db/queries/posts";
 import { getSessionContext, isOwner } from "@/lib/auth";
-import { getBacklinks, getLinkedPages } from "@/lib/links";
+import { getBacklinks, getLinkedDecisions, getLinkedPages } from "@/lib/links";
 import { Button } from "@/components/ui/button";
 import { BacklinksPanel } from "@/components/wiki/backlinks-panel";
 import { ColumnsTable } from "@/components/catalog/columns-table";
@@ -29,13 +30,17 @@ export async function SourceDetail({
 
   // ---- Edit mode (owner only) ----
   if (owner && edit) {
-    const [allPages, linkedConcepts] = await Promise.all([
-      listPages(),
-      getLinkedPages("source", source.id, { includePrivate: true }),
-    ]);
+    const [allPages, decisions, linkedConcepts, linkedDecisions] =
+      await Promise.all([
+        listPages(),
+        listPosts("decision"),
+        getLinkedPages("source", source.id, { includePrivate: true }),
+        getLinkedDecisions("source", source.id, { includePrivate: true }),
+      ]);
     const conceptOptions = allPages
       .filter((p) => p.kind === "concept")
       .map((p) => ({ id: p.id, title: p.title }));
+    const decisionOptions = decisions.map((d) => ({ id: d.id, title: d.title }));
 
     return (
       <SourceEditor
@@ -60,13 +65,16 @@ export async function SourceDetail({
         }))}
         conceptOptions={conceptOptions}
         initialConceptIds={linkedConcepts.map((p) => p.id)}
+        decisionOptions={decisionOptions}
+        initialDecisionIds={linkedDecisions.map((d) => d.id)}
       />
     );
   }
 
   // ---- Reader ----
-  const [concepts, backlinks] = await Promise.all([
+  const [concepts, decisions, backlinks] = await Promise.all([
     getLinkedPages("source", source.id, { includePrivate: owner }),
+    getLinkedDecisions("source", source.id, { includePrivate: owner }),
     getBacklinks("source", source.id, { includePrivate: owner }),
   ]);
 
@@ -154,6 +162,30 @@ export async function SourceDetail({
                   className="rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
                 >
                   {c.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {decisions.length > 0 ? (
+        <div className="mt-8">
+          <h2 className="mb-1 flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+            <ScrollText className="size-4" />
+            Decisions
+          </h2>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Why it&apos;s shaped this way.
+          </p>
+          <ul className="flex flex-wrap gap-2">
+            {decisions.map((d) => (
+              <li key={d.id}>
+                <Link
+                  href={`/decisions/${d.slug}`}
+                  className="rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted"
+                >
+                  {d.title}
                 </Link>
               </li>
             ))}

@@ -116,6 +116,77 @@ export async function setLinkedPages(
 }
 
 /**
+ * Decision records a catalog node links *to* — the "why" direction. A model or
+ * source points at the decisions that shaped it; the reverse shows up in the
+ * decision's backlinks. Private decisions omitted unless `includePrivate`.
+ */
+export async function getLinkedDecisions(
+  sourceType: NodeType,
+  sourceId: string,
+  { includePrivate = false }: { includePrivate?: boolean } = {},
+): Promise<{ id: string; title: string; slug: string }[]> {
+  const rows = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      slug: posts.slug,
+      visibility: posts.visibility,
+    })
+    .from(links)
+    .innerJoin(posts, eq(posts.id, links.targetId))
+    .where(
+      and(
+        eq(links.sourceType, sourceType),
+        eq(links.sourceId, sourceId),
+        eq(links.targetType, "post"),
+        eq(posts.kind, "decision"),
+      ),
+    );
+
+  return rows
+    .filter((r) => includePrivate || r.visibility !== "private")
+    .map((r) => ({ id: r.id, title: r.title, slug: r.slug }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+}
+
+/**
+ * Replace a catalog node's outgoing decision-links with an explicit set of post
+ * ids. Catalog→post links are only ever decision references (the "why" picker),
+ * so replacing all post-targeted links for the source is safe.
+ */
+export async function setLinkedDecisions(
+  sourceType: NodeType,
+  sourceId: string,
+  postIds: string[],
+): Promise<void> {
+  const unique = Array.from(new Set(postIds.filter(Boolean)));
+  await db.transaction(async (tx) => {
+    await tx
+      .delete(links)
+      .where(
+        and(
+          eq(links.sourceType, sourceType),
+          eq(links.sourceId, sourceId),
+          eq(links.targetType, "post"),
+        ),
+      );
+    if (unique.length > 0) {
+      await tx
+        .insert(links)
+        .values(
+          unique.map((targetId) => ({
+            sourceType,
+            sourceId,
+            targetType: "post" as const,
+            targetId,
+          })),
+        )
+        .onConflictDoNothing();
+    }
+  });
+}
+
+/**
  * Reconcile a node's outgoing `[[wikilinks]]` with the `links` table.
  *
  * Works for any source (page or post). Wikilink titles resolve to pages
