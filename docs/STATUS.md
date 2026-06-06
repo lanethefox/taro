@@ -39,8 +39,10 @@ stays as-is; the principle-driven additions land next.
   `links` rows; catalog refs show in a concept's backlinks, both directions),
   **grain on sources + definition-led readers/editors** (slice 1), and
   **decision↔node links** (slice 2 — a model/source picks the decisions that
-  shaped it; they surface in the decision's "Referenced by"). **Remaining:**
-  lineage graph (React Flow over `model_dependencies`), relationships UI, plus
+  shaped it; they surface in the decision's "Referenced by"), and the
+  **lineage graph** (React Flow DAG over `model_dependencies`, longest-path
+  layered layout; pure layout in `src/lib/graph/dag-layout.ts`, shared
+  `ModelNode` in `src/components/graph/`). **Remaining:** relationships UI, plus
   the M2.5 semantic-layer thread (Glossary, "How taro thinks" page,
   catalog/concepts in search). Then M3 ERD, M4 polish.
 

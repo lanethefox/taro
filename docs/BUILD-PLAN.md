@@ -158,7 +158,7 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
       views with name → definition → grain → structure → links (Principles 1, 3).
 - [ ] **Capture the why** — decision records link to catalog/concept nodes; a
       model shows the decisions that shaped it (Principle 4).
-- [ ] `model_dependencies` → **lineage graph** (React Flow), upstream/downstream
+- [x] `model_dependencies` → **lineage graph** (React Flow), upstream/downstream
       navigation (the "how-it-connects" structural layer).
 
 ### M2.5 — Semantic layer (new)
