@@ -5,6 +5,7 @@ import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import {
   columns,
+  modelDependencies,
   models,
   sources,
   type Column,
@@ -60,6 +61,18 @@ export async function listSources(): Promise<SourceListItem[]> {
     })
     .from(sources)
     .orderBy(asc(sources.name));
+}
+
+export type ModelDependencyRow = { upstreamId: string; downstreamId: string };
+
+/** All lineage edges (upstream feeds downstream) — powers the lineage graph. */
+export async function listModelDependencies(): Promise<ModelDependencyRow[]> {
+  return db
+    .select({
+      upstreamId: modelDependencies.upstreamId,
+      downstreamId: modelDependencies.downstreamId,
+    })
+    .from(modelDependencies);
 }
 
 export async function getModelById(id: string): Promise<Model | undefined> {

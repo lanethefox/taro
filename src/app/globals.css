@@ -133,6 +133,47 @@
   --slate: #74a0bb;
 }
 
+/* ---------------------------------------------------------------------------
+   ClassDojo case-study skin. Scoped token overrides (same technique as `.dark`)
+   that flip the parchment palette to ClassDojo's playful green/purple brand for
+   the CD study only. Applied via `.theme-classdojo` on the page wrapper.
+--------------------------------------------------------------------------- */
+.theme-classdojo {
+  --background: #f5f8f4;
+  --foreground: #2d2b3a; /* ClassDojo dark slate-purple ink */
+  --card: #ffffff;
+  --card-foreground: #2d2b3a;
+  --popover: #ffffff;
+  --popover-foreground: #2d2b3a;
+  --primary: #58b947; /* ClassDojo / Mojo green */
+  --primary-foreground: #ffffff;
+  --secondary: #efe9ff; /* soft purple */
+  --secondary-foreground: #5b46b0;
+  --muted: #eef2ec;
+  --muted-foreground: #6c7a6a;
+  --accent: #e6f4e0; /* light green */
+  --accent-foreground: #2f5a27;
+  --destructive: #e5533d;
+  --border: #e3e9e1;
+  --input: #e3e9e1;
+  --ring: #58b947;
+  --radius: 1rem; /* rounder, friendlier */
+  --chart-1: #58b947;
+  --chart-2: #7c5cd6;
+  --chart-3: #f6c244;
+  --chart-4: #4a90d9;
+  --chart-5: #ef6f6c;
+  /* named accents drive the case-study track colors → keep them on-brand */
+  --sage: #58b947; /* technical track = green */
+  --terracotta: #ef6f6c;
+  --wheat: #f6c244;
+  --slate: #4a90d9; /* business track = ClassDojo blue */
+}
+/* A touch more playfulness: rounder tiles within the CD skin. */
+.theme-classdojo .tile {
+  border-radius: 1.1rem;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
