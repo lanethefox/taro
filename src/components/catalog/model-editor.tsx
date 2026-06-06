@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Trash2, X } from "lucide-react";
+import { Save, ScrollText, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteModelAction, saveModelAction } from "@/app/(app)/catalog/actions";
@@ -42,6 +42,8 @@ export function ModelEditor({
   initialColumns,
   conceptOptions,
   initialConceptIds,
+  decisionOptions,
+  initialDecisionIds,
 }: {
   id: string;
   initialName: string;
@@ -57,6 +59,8 @@ export function ModelEditor({
   initialColumns: ColumnDraft[];
   conceptOptions: ConceptOption[];
   initialConceptIds: string[];
+  decisionOptions: ConceptOption[];
+  initialDecisionIds: string[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
@@ -72,6 +76,7 @@ export function ModelEditor({
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
   const [columns, setColumns] = useState<ColumnDraft[]>(initialColumns);
   const [conceptIds, setConceptIds] = useState<string[]>(initialConceptIds);
+  const [decisionIds, setDecisionIds] = useState<string[]>(initialDecisionIds);
   const [saving, startSaving] = useTransition();
   const [deleting, startDeleting] = useTransition();
 
@@ -102,6 +107,7 @@ export function ModelEditor({
             .filter(Boolean),
         })),
         conceptIds,
+        decisionIds,
       });
       if (res.ok) {
         toast.success("Saved");
@@ -155,6 +161,26 @@ export function ModelEditor({
         className="mb-4 h-auto border-0 px-0 font-mono text-3xl font-semibold shadow-none focus-visible:ring-0"
       />
 
+      <div className="mb-5 space-y-1">
+        <Label>Definition</Label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className={areaCls}
+          placeholder="What this model represents and how it's built."
+        />
+      </div>
+
+      <div className="mb-5 space-y-1">
+        <Label>Grain</Label>
+        <Input
+          value={grain}
+          onChange={(e) => setGrain(e.target.value)}
+          placeholder="one row per … (what a single record represents)"
+          className="h-8"
+        />
+      </div>
+
       <div className="mb-5 flex flex-wrap items-center gap-3 text-sm">
         <label className="flex items-center gap-1.5 text-muted-foreground">
           Layer
@@ -193,26 +219,6 @@ export function ModelEditor({
             <option value="public">Public</option>
           </select>
         </label>
-      </div>
-
-      <div className="mb-5 space-y-1">
-        <Label>Grain</Label>
-        <Input
-          value={grain}
-          onChange={(e) => setGrain(e.target.value)}
-          placeholder="one row per …"
-          className="h-8"
-        />
-      </div>
-
-      <div className="mb-5 space-y-1">
-        <Label>Description</Label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className={areaCls}
-          placeholder="What this model represents and how it's built."
-        />
       </div>
 
       <div className="mb-5 space-y-1">
@@ -265,6 +271,17 @@ export function ModelEditor({
           options={conceptOptions}
           selected={conceptIds}
           onChange={setConceptIds}
+        />
+      </div>
+
+      <div className="mb-6 rounded-lg border bg-card p-4">
+        <ConceptPicker
+          options={decisionOptions}
+          selected={decisionIds}
+          onChange={setDecisionIds}
+          title="Related decisions"
+          icon={ScrollText}
+          emptyHint="No decision records yet — write one in the decision log to capture the why."
         />
       </div>
     </div>

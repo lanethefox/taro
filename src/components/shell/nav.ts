@@ -7,6 +7,7 @@ import {
   PenLine,
   ScrollText,
   Search,
+  Sparkles,
   Tag,
   type LucideIcon,
 } from "lucide-react";
@@ -56,6 +57,10 @@ export const navSections: NavSection[] = [
       { label: "ERD", href: "/erd", icon: Network },
       { label: "Search", href: "/search", icon: Search },
     ],
+  },
+  {
+    title: "About",
+    items: [{ label: "How taro thinks", href: "/about", icon: Sparkles }],
   },
 ];
 

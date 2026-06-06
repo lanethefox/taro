@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Trash2, X } from "lucide-react";
+import { Save, ScrollText, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { deleteSourceAction, saveSourceAction } from "@/app/(app)/catalog/actions";
@@ -29,6 +29,7 @@ export function SourceEditor({
   initialName,
   initialDescription,
   initialSystem,
+  initialGrain,
   initialFreshnessSla,
   initialExpectedVolume,
   initialMonitoringNotes,
@@ -36,11 +37,14 @@ export function SourceEditor({
   initialColumns,
   conceptOptions,
   initialConceptIds,
+  decisionOptions,
+  initialDecisionIds,
 }: {
   id: string;
   initialName: string;
   initialDescription: string;
   initialSystem: string;
+  initialGrain: string;
   initialFreshnessSla: string;
   initialExpectedVolume: string;
   initialMonitoringNotes: string;
@@ -48,17 +52,21 @@ export function SourceEditor({
   initialColumns: ColumnDraft[];
   conceptOptions: ConceptOption[];
   initialConceptIds: string[];
+  decisionOptions: ConceptOption[];
+  initialDecisionIds: string[];
 }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
   const [description, setDescription] = useState(initialDescription);
   const [system, setSystem] = useState(initialSystem);
+  const [grain, setGrain] = useState(initialGrain);
   const [freshnessSla, setFreshnessSla] = useState(initialFreshnessSla);
   const [expectedVolume, setExpectedVolume] = useState(initialExpectedVolume);
   const [monitoringNotes, setMonitoringNotes] = useState(initialMonitoringNotes);
   const [visibility, setVisibility] = useState<Visibility>(initialVisibility);
   const [columns, setColumns] = useState<ColumnDraft[]>(initialColumns);
   const [conceptIds, setConceptIds] = useState<string[]>(initialConceptIds);
+  const [decisionIds, setDecisionIds] = useState<string[]>(initialDecisionIds);
   const [saving, startSaving] = useTransition();
   const [deleting, startDeleting] = useTransition();
 
@@ -69,6 +77,7 @@ export function SourceEditor({
         name,
         description,
         system,
+        grain,
         freshnessSla,
         expectedVolume,
         monitoringNotes,
@@ -86,6 +95,7 @@ export function SourceEditor({
             .filter(Boolean),
         })),
         conceptIds,
+        decisionIds,
       });
       if (res.ok) {
         toast.success("Saved");
@@ -139,7 +149,27 @@ export function SourceEditor({
         className="mb-4 h-auto border-0 px-0 font-mono text-3xl font-semibold shadow-none focus-visible:ring-0"
       />
 
-      <div className="mb-5 flex flex-wrap items-end gap-3 text-sm">
+      <div className="mb-5 space-y-1">
+        <Label>Definition</Label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className={areaCls}
+          placeholder="What this source is and where it comes from."
+        />
+      </div>
+
+      <div className="mb-5 space-y-1">
+        <Label>Grain</Label>
+        <Input
+          value={grain}
+          onChange={(e) => setGrain(e.target.value)}
+          placeholder="one row per … (what a single record represents)"
+          className="h-8"
+        />
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-end gap-3 text-sm">
         <label className="flex flex-1 items-center gap-1.5 text-muted-foreground">
           System
           <Input
@@ -161,16 +191,6 @@ export function SourceEditor({
             <option value="public">Public</option>
           </select>
         </label>
-      </div>
-
-      <div className="mb-5 space-y-1">
-        <Label>Description</Label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className={areaCls}
-          placeholder="What this source is and where it comes from."
-        />
       </div>
 
       <div className="mb-6 space-y-4 rounded-lg border bg-card p-4">
@@ -213,6 +233,17 @@ export function SourceEditor({
           options={conceptOptions}
           selected={conceptIds}
           onChange={setConceptIds}
+        />
+      </div>
+
+      <div className="mb-6 rounded-lg border bg-card p-4">
+        <ConceptPicker
+          options={decisionOptions}
+          selected={decisionIds}
+          onChange={setDecisionIds}
+          title="Related decisions"
+          icon={ScrollText}
+          emptyHint="No decision records yet — write one in the decision log to capture the why."
         />
       </div>
     </div>
