@@ -94,10 +94,15 @@ stays as-is; the principle-driven additions land next.
 - No light/dark toggle yet; the cozy `.dark` palette exists but isn't switchable.
 
 ## Git / deploy
-- **Develop on branch `claude/pensive-bell-J2VAJ`.** It is the repo **default
-  branch** and Vercel's **production branch**, so every push **redeploys the
-  live site**. Only push green builds.
-- Open PR for this work: **#2** (into `main`). `main` holds M0 only.
+- **Vercel deploys the `main` branch (production).** Land work on `main` and it
+  redeploys the live site. `claude/pensive-bell-J2VAJ` is kept in sync with
+  `main` (same commit) but Vercel does NOT deploy it. Only push green builds.
+- **Deploy gotcha (resolved 2026-06):** work piled up on `pensive-bell` and
+  never reached `main`, so nothing deployed; reinstalling the Vercel GitHub
+  integration + merging everything to `main` fixed it. Also: don't verify
+  deploys with a file like `/version.txt` — anything not matching the proxy's
+  static-asset extensions is auth-gated and 307s to `/login` for anon requests.
+  Verify with the public `/p/[slug]` route instead (unauthenticated).
 - Live app: **https://taro-snowy.vercel.app** (Vercel, free tier).
 - Supabase project ref: **eargnrmjmgeiwvqgfaob**. DATABASE_URL must be the
   **transaction pooler** (port 6543); client sets `prepare:false`.
