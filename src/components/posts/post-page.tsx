@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Pencil, ScrollText } from "lucide-react";
+import { History, Pencil, ScrollText } from "lucide-react";
 
 import { listPages } from "@/db/queries/pages";
 import {
@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { BacklinksPanel } from "@/components/wiki/backlinks-panel";
 import { ExportButton } from "@/components/posts/export-button";
 import { PostEditor, type DecisionFields } from "@/components/posts/post-editor";
+import { ShareLink } from "@/components/posts/share-link";
 
 const statusLabel: Record<string, string> = {
   proposed: "Proposed",
@@ -129,6 +130,12 @@ export async function PostPage({
         <div className="flex shrink-0 items-center gap-2">
           <ExportButton postId={post.id} />
           {owner ? (
+            <Button variant="outline" render={<Link href={`/history/post/${post.id}`} />}>
+              <History className="size-4" />
+              History
+            </Button>
+          ) : null}
+          {owner ? (
             <Button variant="outline" render={<Link href={`${basePath}/${post.slug}?edit=1`} />}>
               <Pencil className="size-4" />
               Edit
@@ -136,6 +143,10 @@ export async function PostPage({
           ) : null}
         </div>
       </div>
+
+      {owner && post.visibility === "public" ? (
+        <ShareLink slug={post.slug} />
+      ) : null}
 
       {tags.length > 0 ? (
         <div className="mb-5 flex flex-wrap gap-2">

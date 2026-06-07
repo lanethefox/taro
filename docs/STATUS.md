@@ -66,12 +66,12 @@ stays as-is; the principle-driven additions land next.
   coherence nudge (`src/lib/coherence.ts`); **search extended** to catalog
   models/sources/columns (concepts already covered as pages). Follow-up: the
   editor-time "link this term to its concept" nudge.
-- **M4 polish (partial)** — done: **command palette** (⌘K, `command-palette.tsx`,
-  search + nav), **machine-readable context bundle** (`/api/context`,
-  `src/db/queries/context.ts`), **light/dark toggle** (topbar + pre-paint script
-  in root layout). **Remaining M4:** `revisions` history (needs a table +
-  migration) and per-post **public sharing** (needs an unauthed route / proxy
-  allowance).
+- **M4 polish** — done. **Command palette** (⌘K, `command-palette.tsx`),
+  **machine-readable context bundle** (`/api/context`), **light/dark toggle**,
+  **revisions history** (snapshot on each page/post save via
+  `src/db/queries/revisions.ts`; owner view at `/history/[type]/[id]`), and
+  **per-post public sharing** (unauthed `/p/[slug]`; owner copy-link on the post
+  reader). taro's build plan (M0–M4 + M2.5) is now complete.
 - **ClassDojo warehouse materialized** — the deferred build-out is done. The
   catalog now holds the full CD warehouse: **7 sources, 36 models** (staging →
   intermediate → marts: dims/facts/bridges/WBR) with grain + materialization,
