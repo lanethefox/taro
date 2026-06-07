@@ -126,7 +126,7 @@ export function PageEditor({
             onChange={(e) => setParentId(e.target.value)}
             className="h-8 rounded-md border bg-transparent px-2 text-foreground"
           >
-            <option value="">— None</option>
+            <option value="">None</option>
             {parentOptions
               .filter((p) => p.id !== id)
               .map((p) => (

@@ -6,17 +6,17 @@ const pillars: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: Hash,
     title: "Definitions live in one place",
-    body: "“Customer” is a concept, defined once; the catalog model, the column, and the post point at that definition instead of silently restating — and contradicting — it.",
+    body: "“Customer” gets defined once. The model, the column, and the post all point at that definition instead of quietly restating it and drifting apart.",
   },
   {
     icon: Boxes,
     title: "Every node carries its meaning",
-    body: "Not just columns and types — a plain-language definition and its grain (“what one row represents”), the facts that keep every downstream count and join honest.",
+    body: "A model says what one of its rows is, in plain words, and what its grain is. Columns and types on their own won’t keep your counts and joins honest.",
   },
   {
     icon: Cpu,
     title: "Written for people and machines",
-    body: "Because meaning is explicit, a person reading the catalog, a search query, and — eventually — an AI agent all work from the same definitions. No guessing.",
+    body: "Meaning is written down, so a person reading the catalog and (eventually) an agent hitting the API both work from the same definitions.",
   },
 ];
 
@@ -32,7 +32,7 @@ export default function AboutPage() {
             How taro thinks
           </p>
           <h1 className="text-3xl font-semibold tracking-tight">
-            One graph, one meaning.
+            It’s all one graph.
           </h1>
         </div>
       </div>
@@ -40,24 +40,24 @@ export default function AboutPage() {
       <div className="space-y-5 text-base leading-relaxed text-foreground/90">
         <p>
           In most data orgs the knowledge is scattered across tools that don’t
-          talk: the catalog knows a table’s shape, the wiki holds the theory, the
-          decision log holds the reasoning, the diagram shows how things relate.
-          So the same word — <em>customer</em>, <em>revenue</em>,{" "}
-          <em>active user</em> — quietly comes to mean three different things in
-          three places, and the contradictions surface later as numbers that
-          don’t match and dashboards nobody trusts.
+          talk to each other. The catalog knows a table’s shape, the wiki holds
+          the theory, the decision log holds the reasoning, the diagram shows how
+          things relate. So the same word (<em>customer</em>, <em>revenue</em>,{" "}
+          <em>active user</em>) quietly ends up meaning three different things in
+          three places, and you find out later, when the numbers don’t match and
+          nobody trusts the dashboard.
         </p>
         <p>
-          taro takes the opposite bet:{" "}
+          taro does the opposite.{" "}
           <strong className="font-semibold text-foreground">
-            every artifact is a node in one graph, and meaning is shared, not
-            copied.
+            Every artifact is a node in one graph, and meaning is shared instead
+            of copied.
           </strong>{" "}
-          A concept is defined once. A model states what one of its rows
-          represents. A decision records <em>why</em> it’s shaped that way — and
-          links to the models it shaped. Open any node and you can walk to the
-          rest: a model → the concept that defines its terms → the decision that
-          motivated it → the post that explains it.
+          A concept is defined once. A model says what one of its rows is. A
+          decision records why it’s shaped that way and links to the models it
+          shaped. Open any node and you can walk to the rest: a model, the
+          concept behind it, the decision that drove it, the post that explains
+          it.
         </p>
       </div>
 
@@ -73,18 +73,18 @@ export default function AboutPage() {
 
       <div className="mt-10 rounded-lg border bg-primary/5 p-5">
         <p className="text-base leading-relaxed">
-          The payoff is coherence. Ask{" "}
-          <em>“what is a customer, where is it modeled, and why?”</em> and taro
-          answers in one walk of the graph — instead of a meeting.
+          That’s the whole point. Ask{" "}
+          <em>“what’s a customer, where is it modeled, and why?”</em> and you can
+          answer it by walking the graph instead of booking a meeting.
         </p>
       </div>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        For machines:{" "}
+        For machines: the{" "}
         <a href="/api/context" className="font-medium text-primary hover:underline">
-          the context bundle
+          context bundle
         </a>{" "}
-        — every definition, grain, and relationship as one JSON document.
+        has every definition, grain, and relationship in one JSON file.
       </p>
     </div>
   );

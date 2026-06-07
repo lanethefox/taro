@@ -227,7 +227,7 @@ export function ModelEditor({
           value={sqlNotes}
           onChange={(e) => setSqlNotes(e.target.value)}
           className={monoArea}
-          placeholder="Logic, joins, gotchas — or a SQL sketch."
+          placeholder="Logic, joins, gotchas, or a SQL sketch."
         />
       </div>
 
@@ -281,7 +281,7 @@ export function ModelEditor({
           onChange={setDecisionIds}
           title="Related decisions"
           icon={ScrollText}
-          emptyHint="No decision records yet — write one in the decision log to capture the why."
+          emptyHint="No decision records yet. Write one in the decision log to capture the why."
         />
       </div>
     </div>

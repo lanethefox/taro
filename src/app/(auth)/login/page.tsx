@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 
 export const metadata = {
-  title: "Sign in — taro",
+  title: "Sign in · taro",
 };
 
 function GoogleIcon() {

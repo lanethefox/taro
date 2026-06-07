@@ -26,7 +26,7 @@ export async function generateMetadata({
   const { slug, taskSlug } = await params;
   const cs = await getCaseStudyBySlug(slug);
   const task = cs ? await getTaskBySlug(cs.id, taskSlug) : undefined;
-  return { title: task ? `${task.title} — ${cs?.name}` : "Task" };
+  return { title: task ? `${task.title} · ${cs?.name}` : "Task" };
 }
 
 export default async function TaskPage({

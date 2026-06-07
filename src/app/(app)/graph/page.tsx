@@ -23,7 +23,7 @@ export default async function GraphPage() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight">Graph</h1>
             <p className="text-sm text-muted-foreground">
-              The whole knowledge graph — every node and the links between them.
+              The whole graph. Every node and the links between them.
             </p>
           </div>
         </div>
@@ -36,8 +36,8 @@ export default async function GraphPage() {
       {graph.nodes.length === 0 ? (
         <div className="flex flex-1 items-center justify-center p-6">
           <p className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-            Nothing to graph yet — create pages, posts, or catalog nodes and link
-            them together.
+            Nothing to graph yet. Create some pages, posts, or catalog nodes and
+            link them up.
           </p>
         </div>
       ) : (

@@ -30,7 +30,7 @@ export default async function GlossaryPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Glossary</h1>
           <p className="text-sm text-muted-foreground">
-            Canonical definitions — defined once, used everywhere.
+            Your concepts. Defined once, used everywhere.
           </p>
         </div>
       </div>
@@ -39,7 +39,7 @@ export default async function GlossaryPage() {
         <div className="mb-6 rounded-lg border border-wheat/50 bg-wheat/10 p-4">
           <div className="mb-2 flex items-center gap-2 text-sm font-medium">
             <TriangleAlert className="size-4 text-wheat" />
-            Possible duplicate concepts — consider merging
+            These look like duplicate concepts. Might be worth merging.
           </div>
           <ul className="space-y-1 text-sm text-muted-foreground">
             {dups.map((g, i) => (

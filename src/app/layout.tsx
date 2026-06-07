@@ -18,10 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     default: "taro",
-    template: "%s — taro",
+    template: "%s · taro",
   },
   description:
-    "A personal, portable knowledge platform for analytics engineering: wiki, blog & decision log, ERD designer, and data catalog as one knowledge graph.",
+    "A personal knowledge platform for analytics engineering. Wiki, blog, decision log, data catalog, and ERD, all one linked graph.",
 };
 
 export default function RootLayout({

@@ -26,7 +26,7 @@ export default async function WikiIndexPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Wiki</h1>
             <p className="text-sm text-muted-foreground">
-              Your reference knowledge — linked into one graph.
+              Your reference notes, all linked together.
             </p>
           </div>
         </div>

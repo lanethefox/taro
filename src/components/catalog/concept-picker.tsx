@@ -14,7 +14,7 @@ export function ConceptPicker({
   selected,
   onChange,
   title = "Related concepts",
-  emptyHint = "No concept pages yet — create one in the wiki to link it here.",
+  emptyHint = "No concept pages yet. Make one in the wiki to link it here.",
   icon: Icon = Hash,
 }: {
   options: ConceptOption[];

@@ -43,8 +43,8 @@ export default async function LineagePage() {
         <div className="flex flex-1 items-center justify-center p-6">
           <div className="rounded-lg border border-dashed p-10 text-center">
             <p className="text-sm text-muted-foreground">
-              No models yet — lineage appears once you define models and their
-              dependencies.
+              No models yet. Lineage shows up once you’ve defined some models and
+              their dependencies.
             </p>
             {owner ? (
               <Button className="mt-4" render={<Link href="/catalog/models/new" />}>

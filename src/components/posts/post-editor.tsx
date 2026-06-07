@@ -210,7 +210,7 @@ export function PostEditor({
                 onChange={(e) => setD("supersedesId", e.target.value || null)}
                 className={selectCls}
               >
-                <option value="">— None</option>
+                <option value="">None</option>
                 {supersedeOptions
                   .filter((o) => o.id !== id)
                   .map((o) => (

@@ -37,7 +37,8 @@ export function CatalogList({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Data catalog</h1>
           <p className="text-sm text-muted-foreground">
-            Models, sources, and columns — with tests and observation metadata.
+            Your models, sources, and columns, with tests and observation
+            metadata.
           </p>
         </div>
       </div>

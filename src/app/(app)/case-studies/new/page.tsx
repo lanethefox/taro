@@ -20,8 +20,8 @@ export default async function NewCaseStudyPage({
     <div className="mx-auto max-w-xl px-6 py-10">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight">New case study</h1>
       <p className="mb-6 text-sm text-muted-foreground">
-        It starts pre-loaded with the full technical + business curriculum — a
-        complete, gap-free checklist you work through.
+        It comes pre-loaded with the full technical and business curriculum, so
+        you’ve got a complete checklist to work through.
       </p>
 
       {error ? (

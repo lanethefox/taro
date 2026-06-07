@@ -28,9 +28,8 @@ export default async function CaseStudiesPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-tight">Case studies</h1>
             <p className="max-w-xl text-sm text-muted-foreground">
-              Where the theory gets built. Each case study is a complete,
-              end-to-end analytics scenario — work the checklist, fill in the
-              map, leave no gaps.
+              Where the theory gets built. Each one is a full analytics scenario,
+              start to finish. Work the checklist, fill in the map, leave no gaps.
             </p>
           </div>
         </div>
@@ -47,7 +46,7 @@ export default async function CaseStudiesPage() {
           <Compass className="size-6 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
             No case studies yet.
-            {owner ? " Create one — ClassDojo is a great first scenario." : ""}
+            {owner ? " Create one. ClassDojo is a good first scenario." : ""}
           </p>
           {owner ? (
             <Button render={<Link href="/case-studies/new" />}>
