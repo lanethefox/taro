@@ -19,7 +19,7 @@ export default async function QueryPage() {
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Query</h1>
           <p className="text-sm text-muted-foreground">
-            Run read-only SQL or GraphQL against the warehouse — owner only.
+            Run read-only SQL or GraphQL against the warehouse. Owner only.
           </p>
         </div>
       </header>

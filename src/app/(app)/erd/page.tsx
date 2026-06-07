@@ -33,8 +33,8 @@ export default async function ErdPage({
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">ERD designer</h1>
           <p className="text-sm text-muted-foreground">
-            Saved diagrams over catalog models — layout here, table truth in the
-            catalog.
+            Saved diagrams over your catalog models. The layout lives here, the
+            tables stay in the catalog.
           </p>
         </div>
       </div>

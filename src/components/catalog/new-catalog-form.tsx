@@ -20,7 +20,7 @@ export function NewCatalogForm({
         New {kind}
       </h1>
       <p className="mb-6 text-sm text-muted-foreground">
-        Name it — you can fill in columns and metadata next.
+        Name it. You can fill in columns and metadata next.
       </p>
 
       {error ? (

@@ -243,7 +243,7 @@ export function SourceEditor({
           onChange={setDecisionIds}
           title="Related decisions"
           icon={ScrollText}
-          emptyHint="No decision records yet — write one in the decision log to capture the why."
+          emptyHint="No decision records yet. Write one in the decision log to capture the why."
         />
       </div>
     </div>

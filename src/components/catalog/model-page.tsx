@@ -148,13 +148,13 @@ export async function ModelDetail({
           <p className="font-medium">Observation metadata</p>
           {model.freshnessSla ? (
             <p>
-              <span className="text-muted-foreground">Freshness SLA — </span>
+              <span className="text-muted-foreground">Freshness SLA: </span>
               {model.freshnessSla}
             </p>
           ) : null}
           {model.expectedVolume ? (
             <p>
-              <span className="text-muted-foreground">Expected volume — </span>
+              <span className="text-muted-foreground">Expected volume: </span>
               {model.expectedVolume}
             </p>
           ) : null}

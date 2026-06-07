@@ -22,7 +22,7 @@ export default async function NewPagePage({
     <div className="mx-auto max-w-xl px-6 py-10">
       <h1 className="mb-1 text-2xl font-semibold tracking-tight">New page</h1>
       <p className="mb-6 text-sm text-muted-foreground">
-        Give it a title — you can write and link it next.
+        Give it a title. You can write and link it next.
       </p>
 
       {error ? (
@@ -58,7 +58,7 @@ export default async function NewPagePage({
             defaultValue={parent ?? ""}
             className="flex h-9 w-full rounded-md border bg-transparent px-3 text-sm shadow-sm"
           >
-            <option value="">— None (top level)</option>
+            <option value="">None (top level)</option>
             {pages.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.title}

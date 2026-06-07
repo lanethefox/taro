@@ -59,7 +59,7 @@ export default async function HistoryPage({
 
       {revisions.length === 0 ? (
         <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
-          No history yet — a version is saved each time you edit.
+          No history yet. taro saves a version each time you edit.
         </div>
       ) : (
         <ol className="space-y-3">

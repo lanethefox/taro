@@ -21,7 +21,7 @@ export function NewPostForm({
         New {noun}
       </h1>
       <p className="mb-6 text-sm text-muted-foreground">
-        Give it a title — you can write it next.
+        Give it a title. You can write it next.
       </p>
 
       {error ? (

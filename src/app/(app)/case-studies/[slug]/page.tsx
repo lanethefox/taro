@@ -199,7 +199,7 @@ export default async function CaseStudyBoard({
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Baseline complete. Now log where this build could go further —
+                Baseline complete. Now log where this build could go further:
                 performance, cost, advanced modeling, tighter contracts.
               </p>
             )}
