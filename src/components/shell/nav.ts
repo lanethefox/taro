@@ -9,7 +9,6 @@ import {
   ScrollText,
   Search,
   Sparkles,
-  Tag,
   Terminal,
   Waypoints,
   type LucideIcon,
@@ -36,7 +35,6 @@ export const navSections: NavSection[] = [
       { label: "Glossary", href: "/glossary", icon: Library },
       { label: "Blog", href: "/blog", icon: PenLine },
       { label: "Decisions", href: "/decisions", icon: ScrollText },
-      { label: "Tags", href: "/tags", icon: Tag },
     ],
   },
   {

@@ -52,7 +52,9 @@ export const getSessionContext = cache(
       .from("profiles")
       .select("*", { count: "exact", head: true });
 
-    const role = (count ?? 0) === 0 ? "owner" : "viewer";
+    // First user ever is the owner/admin. Everyone after starts as `pending`
+    // (no access) until the owner approves them.
+    const role = (count ?? 0) === 0 ? "owner" : "pending";
     const meta = user.user_metadata ?? {};
 
     const { data: created, error } = await admin
@@ -90,4 +92,13 @@ export async function requireOwner(): Promise<SessionContext> {
 
 export function isOwner(ctx: SessionContext | null): boolean {
   return ctx?.profile.role === "owner";
+}
+
+/** Approved = can read the app (owner or viewer). Pending users cannot. */
+export function isApproved(ctx: SessionContext | null): boolean {
+  return ctx?.profile.role === "owner" || ctx?.profile.role === "viewer";
+}
+
+export function isPending(ctx: SessionContext | null): boolean {
+  return ctx?.profile.role === "pending";
 }

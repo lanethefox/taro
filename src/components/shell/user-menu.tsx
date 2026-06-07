@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { LogOut, User, Users } from "lucide-react";
 
 import { signOut } from "@/app/(auth)/actions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -52,6 +53,17 @@ export function UserMenu({
             {role}
           </span>
         </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer" render={<Link href="/account" />}>
+          <User className="size-4" />
+          Account
+        </DropdownMenuItem>
+        {role === "owner" ? (
+          <DropdownMenuItem className="cursor-pointer" render={<Link href="/admin/users" />}>
+            <Users className="size-4" />
+            Manage users
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"

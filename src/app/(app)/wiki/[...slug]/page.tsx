@@ -115,13 +115,12 @@ export default async function WikiPageView({
       {pageTags.length > 0 ? (
         <div className="mb-5 flex flex-wrap gap-2">
           {pageTags.map((t) => (
-            <Link
+            <span
               key={t.id}
-              href={`/tags/${t.slug}`}
-              className="rounded-full border bg-card px-2.5 py-0.5 text-xs hover:bg-muted"
+              className="rounded-full border bg-card px-2.5 py-0.5 text-xs text-muted-foreground"
             >
               #{t.name}
-            </Link>
+            </span>
           ))}
         </div>
       ) : null}

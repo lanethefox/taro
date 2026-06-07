@@ -151,9 +151,14 @@ stays as-is; the principle-driven additions land next.
 - **Reads**: Server Components + `src/db/queries/*`. **Mutations**: Server
   Actions, each starting with `requireOwner()` (or `requireSession()`).
 - **AuthZ**: `src/lib/auth.ts` — `getSessionContext` provisions a `profiles` row
-  on first sign-in (first user = owner, rest = viewer). Because the Drizzle
-  client bypasses RLS, **filter visibility in app code** (owners see all; others
-  never see `private`). RLS is defense-in-depth.
+  on first sign-in. **Roles: `owner` (admin) / `viewer` / `pending`.** First user
+  ever = owner; everyone after = `pending` (no access; the (app) layout shows an
+  "access requested" screen). The owner approves/sets roles at **/admin/users**
+  (`src/lib/users.ts` + `admin/actions.ts`); user menu links to **/account** +
+  Manage users. Because the Drizzle client bypasses RLS, **filter visibility in
+  app code** (owners see all; viewers never see `private`; pending see nothing).
+  RLS is defense-in-depth. (Per-node per-user ACLs are a future extension; today
+  it's role tiers + visibility.)
 - **Graph**: `src/lib/links.ts` — `syncLinks(sourceType, id, doc)` reconciles
   `[[wikilink]]` → page targets (auto-creates stub pages for red links);
   catalog nodes have plain-text descriptions (no wikilinks) so they link to

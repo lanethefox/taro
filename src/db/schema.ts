@@ -53,7 +53,7 @@ const timestamps = {
 /* Enums                                                                       */
 /* -------------------------------------------------------------------------- */
 
-export const roleEnum = pgEnum("role", ["owner", "viewer"]);
+export const roleEnum = pgEnum("role", ["owner", "viewer", "pending"]);
 export const visibilityEnum = pgEnum("visibility", [
   "private",
   "viewer",
