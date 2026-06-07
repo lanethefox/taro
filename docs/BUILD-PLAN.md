@@ -187,10 +187,10 @@ Each milestone leaves taro usable. Treat the checklists as the task backlog.
       (search results + nav destinations).
 - [x] **Machine-readable context bundle** — definitions + grain + structure +
       relationships as JSON at `/api/context` (Principle 5, north star).
-- [ ] `revisions` history for pages/posts. (Needs a `revisions` table +
-      migration — not yet done.)
-- [ ] Per-post public sharing (visibility flag + unauth render). (Needs an
-      unauthed route / proxy allowance — not yet done.)
+- [x] `revisions` history for pages/posts (append-only snapshot on each save;
+      owner history view at `/history/[type]/[id]`).
+- [x] Per-post public sharing — public posts render unauthed at `/p/[slug]`
+      (proxy already allow-lists `/p/*`); owner gets a copyable share link.
 - [x] Light/dark theme (toggle in the topbar; pre-paint no-flash script).
 - [x] Deployed to Vercel. (NB: production auto-deploy from the prod branch is
       currently not firing — a Vercel dashboard setting; building is unaffected.)

@@ -10,9 +10,10 @@ import {
   getPageById,
   updatePage,
 } from "@/db/queries/pages";
-import { requireOwner } from "@/lib/auth";
+import { getSessionContext, requireOwner } from "@/lib/auth";
 import type { JSONContent } from "@/lib/content";
 import { removeAllLinksFor, syncLinks } from "@/lib/links";
+import { recordRevision } from "@/db/queries/revisions";
 import { syncTags } from "@/lib/tags";
 
 const createSchema = z.object({
@@ -84,6 +85,15 @@ export async function savePageAction(input: {
 
   await syncLinks("page", page.id, parsed.data.content as JSONContent);
   await syncTags("page", page.id, parsed.data.tags);
+
+  const ctx = await getSessionContext();
+  await recordRevision({
+    nodeType: "page",
+    nodeId: page.id,
+    title: page.title,
+    content: parsed.data.content as JSONContent,
+    editorId: ctx?.profile.userId ?? null,
+  });
 
   revalidatePath("/wiki");
   revalidatePath(`/wiki/${page.slug}`);

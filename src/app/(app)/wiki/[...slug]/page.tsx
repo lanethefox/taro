@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Hash, Pencil } from "lucide-react";
+import { Hash, History, Pencil } from "lucide-react";
 
 import { getPageBySlug, listPages } from "@/db/queries/pages";
 import { getSessionContext, isOwner } from "@/lib/auth";
@@ -93,13 +93,22 @@ export default async function WikiPageView({
           </p>
         </div>
         {owner ? (
-          <Button
-            variant="outline"
-            render={<Link href={`/wiki/${page.slug}?edit=1`} />}
-          >
-            <Pencil className="size-4" />
-            Edit
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              variant="outline"
+              render={<Link href={`/history/page/${page.id}`} />}
+            >
+              <History className="size-4" />
+              History
+            </Button>
+            <Button
+              variant="outline"
+              render={<Link href={`/wiki/${page.slug}?edit=1`} />}
+            >
+              <Pencil className="size-4" />
+              Edit
+            </Button>
+          </div>
         ) : null}
       </div>
 

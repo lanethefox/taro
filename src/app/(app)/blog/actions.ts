@@ -11,9 +11,10 @@ import {
   updatePost,
   upsertDecisionMeta,
 } from "@/db/queries/posts";
-import { requireOwner } from "@/lib/auth";
+import { getSessionContext, requireOwner } from "@/lib/auth";
 import type { JSONContent } from "@/lib/content";
 import { removeAllLinksFor, syncLinks } from "@/lib/links";
+import { recordRevision } from "@/db/queries/revisions";
 import { syncTags } from "@/lib/tags";
 
 const createSchema = z.object({
@@ -99,6 +100,15 @@ export async function savePostAction(input: {
       supersedesId: parsed.data.decision.supersedesId ?? null,
     });
   }
+
+  const ctx = await getSessionContext();
+  await recordRevision({
+    nodeType: "post",
+    nodeId: post.id,
+    title: post.title,
+    content: parsed.data.content as JSONContent,
+    editorId: ctx?.profile.userId ?? null,
+  });
 
   const listPath = listPathFor(post.kind);
   revalidatePath(listPath);
