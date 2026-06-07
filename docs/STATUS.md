@@ -122,6 +122,15 @@ stays as-is; the principle-driven additions land next.
   ~14 fundamentals plus an `Analytics engineering practice` hub that re-homes
   the 6 strategy concepts (run `seed.sql` before `seed_wiki.sql`). The `/wiki`
   index renders this hierarchy (no more flat "strategy library" dump).
+- **Second top-level wiki tree: `Product analytics`** (2026-06), a sibling of
+  `Data modeling`. 19 pages seeded via the Supabase MCP (data-only, no repo
+  migration): a root, 10 theory fundamentals (the event, event design, taxonomy
+  & ontology, identity & sessions, tracking plans, metrics, from events to
+  models, experimentation [fleshed out with subsections], etc.), a
+  `Product analytics practice` hub with 6 best-practice pages (instrumentation,
+  platforms, governance, privacy, team models, connecting to the warehouse), and
+  a `Voices and canon` reading list. Cross-linked into the data-modeling concepts
+  (Grain, Semantics, Entities, Counting) via `links` rows. `viewer` visibility.
 - The agent has **no DB access from the sandbox** unless a Supabase MCP server
   or `DATABASE_URL` env secret is configured. Generate migrations with
   `pnpm drizzle-kit generate` (no DB needed); the user (or the Supabase MCP)
