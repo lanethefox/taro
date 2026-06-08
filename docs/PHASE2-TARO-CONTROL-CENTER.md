@@ -259,6 +259,12 @@ migrations generated with drizzle-kit and applied via the Supabase MCP.
   is the AE backlog with owner status control and **auto-close** when a check
   passes again (`reconcileRemediations`). Track a finding → it lands on the
   backlog. Nav: Control center / Conformance / Audit / Remediation / Cost.
-- **M5–M6** follow per §8 (domain panels + content + trend; metrics governance +
-  agent context).
+- **M5 (done)** — per-arm domain panels (`/taro/domains/[slug]`) fusing
+  domain-specific content, conformance score + trend, the arm's cost center
+  (budget vs actual + its spenders), top gaps, open remediations, a definition of
+  done (≥ target conformance + within budget), and its node list. **Conformance
+  snapshots + trend** (`snapshotConformance` / `getConformanceTrend`) with a
+  Snapshot button and sparklines on the control center and panels. Authored
+  content seeded for all six arms.
+- **M6** follows per §8 (metrics governance + conformance/cost-aware agent context).
 

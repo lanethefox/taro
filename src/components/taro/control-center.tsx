@@ -10,6 +10,8 @@ import {
 
 import type { DomainWithCounts, PlatformOverview } from "@/db/queries/taro";
 import { Button } from "@/components/ui/button";
+import { Sparkline } from "@/components/taro/sparkline";
+import { SnapshotButton } from "@/components/taro/snapshot-button";
 
 function scoreColor(score: number): string {
   if (score >= 80) return "text-sage";
@@ -52,12 +54,14 @@ export function ControlCenter({
   owner,
   platformScore,
   domainScores,
+  platformTrend,
 }: {
   overview: PlatformOverview;
   domains: DomainWithCounts[];
   owner: boolean;
   platformScore: number | null;
   domainScores: Record<string, number>;
+  platformTrend: number[];
 }) {
   const lastImport = overview.lastImportAt
     ? new Date(overview.lastImportAt).toLocaleDateString("en-US", {
@@ -93,14 +97,22 @@ export function ControlCenter({
                 {platformScore}
               </div>
               <div className="text-xs text-muted-foreground">conformance</div>
+              {platformTrend.length >= 2 ? (
+                <div className="mt-1 flex justify-end">
+                  <Sparkline values={platformTrend} className={scoreColor(platformScore)} />
+                </div>
+              ) : null}
             </Link>
           ) : null}
-          {owner ? (
-            <Button variant="outline" render={<Link href="/taro/import" />}>
-              <Upload className="size-4" />
-              Import dbt
-            </Button>
-          ) : null}
+          <div className="flex flex-col gap-2">
+            {owner ? <SnapshotButton /> : null}
+            {owner ? (
+              <Button variant="outline" size="sm" render={<Link href="/taro/import" />}>
+                <Upload className="size-4" />
+                Import dbt
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -144,7 +156,12 @@ export function ControlCenter({
               return (
                 <div key={d.id} className="tile flex flex-col gap-3 p-5">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-medium tracking-tight">{d.name}</h3>
+                    <Link
+                      href={`/taro/domains/${d.slug}`}
+                      className="font-medium tracking-tight hover:text-primary hover:underline"
+                    >
+                      {d.name}
+                    </Link>
                     <div className="flex items-center gap-2">
                       {score !== undefined ? (
                         <span
