@@ -145,6 +145,27 @@ stays as-is; the principle-driven additions land next.
   self-contained, idempotent) plus `supabase/seed_domains_crosslinks.sql` (run
   after all five so cross-section wikilinks resolve). Generator: `/tmp/gen-domains.mjs`
   (not committed). Titles are globally unique because wikilinks resolve by title.
+- **Two more top-level trees + AE-practice removed** (2026-06). Replaced the
+  `Analytics engineering practice` hub (5 thin strategy stubs) with two full
+  sections: **Transformation and orchestration** (14 pages: the dbt build layer
+  — ELT, project structure, materializations, modeling approaches, tests &
+  contracts, the 2026 dbt ecosystem [Fusion, Core v2, the Fivetran+dbt merger],
+  plus orchestration — Airflow vs Dagster, orchestrating dbt, CI/CD, observability)
+  and **Analytics engineering** (12 pages: the umbrella discipline — definition,
+  role, principles, the modern data stack, the semantic layer [OSI v1.0], data
+  contracts, **serving data to AI agents** [text-to-SQL failure modes, MCP/dbt MCP,
+  Cortex/Genie/Gemini], presentation layers, AI's impact on the role, and a
+  referential "How taro is built on these ideas"). 26 new pages. The three
+  pages still referenced by the domain sections (**Materialization strategies**,
+  **Testing & data quality**, **ML / AI integration**) were rebuilt from scratch
+  with the same slugs/titles under Transformation and orchestration so all inbound
+  wikilinks keep resolving; `Data modeling`'s link was repointed to `Analytics
+  engineering`. Verified live: **9 top-level sections, 0 unresolved wikilinks**
+  across the whole wiki. Seeds: `seed_transformation_orchestration.sql`,
+  `seed_analytics_engineering.sql`, `seed_ae_crosslinks.sql`; `seed.sql` and
+  `seed-wiki.mjs` were edited to drop the retired node (regenerate seed_wiki.sql
+  with `node supabase/seed-wiki.mjs > supabase/seed_wiki.sql`). Generator
+  `/tmp/gen-ae.mjs` (not committed). Research was 2026-source-prioritized.
 - The agent has **no DB access from the sandbox** unless a Supabase MCP server
   or `DATABASE_URL` env secret is configured. Generate migrations with
   `pnpm drizzle-kit generate` (no DB needed); the user (or the Supabase MCP)

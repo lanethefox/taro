@@ -64,7 +64,7 @@ const pages = [
         "[[Seeing the business]] — processes, domains, and shared language.",
         "[[Data modeling as continuous practice]].",
       ]),
-      p("Then put it to work in an analytics stack: [[Analytics engineering practice]] covers materialization, observation, orchestration, testing, and ML/AI integration."),
+      p("Then put it to work in an analytics stack: [[Analytics engineering]] covers materialization, observation, orchestration, testing, and ML/AI integration."),
     ],
   },
   {
@@ -291,34 +291,15 @@ const pages = [
       p("See [[Why data modeling matters]] for the debt these create, and [[Grain]] and [[Counting & aggregation]] for where they bite hardest."),
     ],
   },
-  {
-    title: "Analytics engineering practice",
-    slug: "analytics-engineering-practice",
-    kind: "wiki",
-    parent: "data-modeling",
-    body: [
-      p("How the modeling fundamentals show up in an analytics-engineering stack — the strategies for building, observing, and orchestrating the analytics layer, and handing it off to ML and AI. (Formerly the standalone strategy library; now grounded in the fundamentals above.)"),
-      ul([
-        "[[Materialization strategies]] — view vs. table vs. incremental vs. ephemeral, and the cost/performance trade-offs.",
-        "[[Observation strategies]] — freshness, volume, distribution, anomalies, contracts, alerting.",
-        "[[Orchestration strategies]] — scheduling, dependency graphs, backfills, CI/CD for transformations.",
-        "[[Testing & data quality]] — test taxonomy, coverage, and contracts.",
-        "[[ML / AI integration]] — feature/marts hand-off, embeddings and vector stores, LLM-assisted docs and semantic search.",
-      ]),
-      p("These build on the fundamentals in [[Data modeling]] — especially [[Grain]], [[Semantics & the semantic layer]], and [[Time in data modeling]]."),
-    ],
-  },
 ];
+// The "Analytics engineering practice" hub was retired; its ground is now two
+// top-level sections with full content: supabase/seed_transformation_orchestration.sql
+// and supabase/seed_analytics_engineering.sql.
 
 // The strategy-library concepts seeded by supabase/seed.sql exist as top-level
 // pages; re-home them so the wiki is one tree (run seed.sql before this file).
 const reparent = [
   { child: "modeling-theory", parent: "data-modeling" },
-  { child: "materialization-strategies", parent: "analytics-engineering-practice" },
-  { child: "observation-strategies", parent: "analytics-engineering-practice" },
-  { child: "orchestration-strategies", parent: "analytics-engineering-practice" },
-  { child: "testing-and-data-quality", parent: "analytics-engineering-practice" },
-  { child: "ml-ai-integration", parent: "analytics-engineering-practice" },
 ];
 
 /* ---- emit SQL ------------------------------------------------------------ */
