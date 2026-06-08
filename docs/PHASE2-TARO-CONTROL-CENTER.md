@@ -254,6 +254,11 @@ migrations generated with drizzle-kit and applied via the Supabase MCP.
   **backfill predictor** (`src/lib/cost/backfill.ts`) at source/model/column
   level, an owner cost-function **editor** (`/taro/cost/config`), and **token/LLM
   cost** modeled as a Claude API source with a per-token function.
-- **M4–M6** follow per §8 (audit + remediation; domain panels + content + trend;
-  metrics governance + agent context).
+- **M4 (done)** — audit + remediation. `/taro/audit` turns failing checks into
+  findings grouped by principle (the rubric is the detector); `/taro/remediation`
+  is the AE backlog with owner status control and **auto-close** when a check
+  passes again (`reconcileRemediations`). Track a finding → it lands on the
+  backlog. Nav: Control center / Conformance / Audit / Remediation / Cost.
+- **M5–M6** follow per §8 (domain panels + content + trend; metrics governance +
+  agent context).
 
