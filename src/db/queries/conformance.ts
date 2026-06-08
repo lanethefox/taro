@@ -74,6 +74,7 @@ export async function getConformanceReport(
         description: models.description,
         domainId: models.domainId,
         freshnessSla: models.freshnessSla,
+        sql: models.sql,
         visibility: models.visibility,
       })
       .from(models),
@@ -178,6 +179,7 @@ export async function getConformanceReport(
       description: m.description,
       domainId: m.domainId,
       freshnessSla: m.freshnessSla,
+      sql: m.sql,
       columns: colsByParent.get(key) ?? [],
       upstreamMaterializations: upstreamMats.get(m.id) ?? [],
       upstreamCount: upstreamCount.get(m.id) ?? 0,
@@ -211,6 +213,7 @@ export async function getConformanceReport(
       description: s.description,
       domainId: s.domainId,
       freshnessSla: s.freshnessSla,
+      sql: null,
       columns: colsByParent.get(key) ?? [],
       upstreamMaterializations: [],
       upstreamCount: 0,

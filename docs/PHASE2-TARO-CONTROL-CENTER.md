@@ -276,3 +276,24 @@ migrations generated with drizzle-kit and applied via the Supabase MCP.
 score it against the principles → attribute cost per arm → audit & remediate →
 per-arm panels with content + trend → serve governed context to agents.
 
+## 11. Legacy models & the decomposition advisor (M7, in progress)
+Goal: catch bloated, non-conforming legacy models, **inspect their SQL**, and
+recommend a rebuild that conforms to the business model — flagging the ones too
+tangled to auto-decompose. Built:
+- **SQL on models** (migration 0005) — the importer will populate from manifest
+  `compiled_code`; legacy examples seeded by hand (`supabase/seed_legacy_models.sql`:
+  a god model that recomputes revenue/orders/active_users/MRR, a mart reading a
+  source directly, a temp model recomputing active users).
+- **Analyzer** (`src/lib/sql/analyze.ts`, pure, smoke-tested) — heuristic smells:
+  god model, recomputed canonical metric (`src/lib/sql/metrics.ts` registry),
+  direct source read, no refs, SELECT *, deep nesting, nonstandard naming.
+- **Advisor** (`src/lib/sql/decompose.ts`) — maps each smell to a concrete rebuild
+  step (extract staging, reuse the canonical metric via ref, split by grain,
+  flatten, rename) and a verdict: **decomposable** (with plan + confidence) or
+  **needs_review** (flagged) when too tangled.
+- **Surfaced**: a `clean_sql` conformance check (legacy models now fail and appear
+  in conformance/audit); an **inspector** (`/taro/decompose/[id]`) showing the
+  SQL, issues, rebuild plan, and verdict, linked from audit's Clean-SQL findings.
+- **Next layer**: an LLM-assisted deep pass (rewrite the SQL, reconcile metrics) —
+  consumes exactly the token cost the FinOps model tracks.
+

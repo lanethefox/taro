@@ -343,6 +343,8 @@ export const models = pgTable(
     grain: text("grain"),
     ownerId: uuid("owner_id"),
     sqlNotes: text("sql_notes"),
+    /** The model's SQL body (compiled/raw) — powers the decomposition advisor. */
+    sql: text("sql"),
     freshnessSla: text("freshness_sla"),
     expectedVolume: text("expected_volume"),
     monitoringNotes: text("monitoring_notes"),
