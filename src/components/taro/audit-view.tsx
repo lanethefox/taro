@@ -124,6 +124,14 @@ export function AuditView({
                                 {n.domainName ?? "unassigned"}
                               </span>
                             </span>
+                            {g.check.key === "clean_sql" && n.nodeType === "model" ? (
+                              <Link
+                                href={`/taro/decompose/${n.nodeId}`}
+                                className="inline-flex shrink-0 items-center gap-1 rounded-md border border-input px-2 py-0.5 text-xs text-primary hover:bg-muted"
+                              >
+                                Inspect
+                              </Link>
+                            ) : null}
                             {owner ? (
                               isTracked ? (
                                 <span className="shrink-0 text-xs text-muted-foreground">tracked</span>

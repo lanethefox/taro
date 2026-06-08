@@ -5,6 +5,8 @@
  * links to "how to fix it". Pure and dependency-free (smoke-testable).
  */
 
+import { analyzeSql, hasBlockingIssues } from "@/lib/sql/analyze";
+
 export type CheckStatus = "pass" | "fail" | "warn" | "na";
 export type AppliesTo = "model" | "source" | "both";
 
@@ -27,6 +29,8 @@ export type ConformanceNode = {
   domainId: string | null;
   freshnessSla: string | null;
   columns: ConformanceColumn[];
+  /** The model's SQL body, if known — powers the legacy/decomposition check. */
+  sql: string | null;
   /** Materializations of this model's upstream models (for view-chain detection). */
   upstreamMaterializations: string[];
   upstreamCount: number;
@@ -167,6 +171,17 @@ export const CHECKS: CheckDef[] = [
     principleTitle: "dbt anti-patterns",
     evaluate: (n) =>
       !(n.materialization === "view" && n.upstreamMaterializations.includes("view")),
+  },
+  {
+    key: "clean_sql",
+    title: "Clean SQL",
+    description: "No legacy anti-patterns (bloat, recomputed metrics, direct source reads).",
+    appliesTo: "model",
+    severity: "error",
+    weight: 2,
+    principleTitle: "dbt anti-patterns",
+    evaluate: (n) =>
+      !n.sql || !hasBlockingIssues(analyzeSql({ name: n.name, layer: n.layer, sql: n.sql })),
   },
   {
     key: "freshness",
