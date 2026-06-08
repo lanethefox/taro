@@ -18,8 +18,18 @@ export function normalizeTitle(title: string): string {
   return base.replace(/s\b/g, "");
 }
 
+/** Generic words that shouldn't drive a "same concept" match. */
+const STOPWORDS = new Set([
+  "the", "a", "an", "and", "or", "of", "in", "on", "to", "for", "with",
+  "is", "are", "as", "at", "by", "vs", "dbt",
+]);
+
 function words(title: string): Set<string> {
-  return new Set(normalizeTitle(title).split(" ").filter(Boolean));
+  return new Set(
+    normalizeTitle(title)
+      .split(" ")
+      .filter((w) => w && !STOPWORDS.has(w)),
+  );
 }
 
 function jaccard(a: Set<string>, b: Set<string>): number {
@@ -30,12 +40,14 @@ function jaccard(a: Set<string>, b: Set<string>): number {
 }
 
 /**
- * Group titles that are likely the same concept: identical normalized form, or
- * a high word-overlap (Jaccard ≥ threshold). Union-find over near pairs.
+ * Group titles that are likely the *same* concept: identical normalized form, or
+ * a high content-word overlap (Jaccard ≥ threshold over non-stopwords, requiring
+ * at least two shared-meaning words so titles that merely share a generic word
+ * like "in dbt" or "data stack" aren't flagged). Union-find over near pairs.
  */
 export function findNearDuplicates(
   nodes: TitledNode[],
-  threshold = 0.6,
+  threshold = 0.8,
 ): DuplicateGroup[] {
   const n = nodes.length;
   const parent = Array.from({ length: n }, (_, i) => i);
@@ -49,11 +61,10 @@ export function findNearDuplicates(
 
   for (let i = 0; i < n; i++) {
     for (let j = i + 1; j < n; j++) {
+      const bothMeaningful = Math.min(wsets[i].size, wsets[j].size) >= 2;
       const near =
         norm[i] === norm[j] ||
-        norm[i].includes(norm[j]) ||
-        norm[j].includes(norm[i]) ||
-        jaccard(wsets[i], wsets[j]) >= threshold;
+        (bothMeaningful && jaccard(wsets[i], wsets[j]) >= threshold);
       if (near) union(i, j);
     }
   }
