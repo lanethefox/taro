@@ -266,5 +266,13 @@ migrations generated with drizzle-kit and applied via the Supabase MCP.
   snapshots + trend** (`snapshotConformance` / `getConformanceTrend`) with a
   Snapshot button and sparklines on the control center and panels. Authored
   content seeded for all six arms.
-- **M6** follows per §8 (metrics governance + conformance/cost-aware agent context).
+- **M6 (done)** — semantic/metrics governance (`/taro/metrics`): catalog-wiring
+  coverage, defined-but-unwired concepts, near-duplicate coherence nudges, and a
+  link to the **governance-aware agent context**. `/api/context` now carries each
+  node's arm, conformance (score + open gaps), and monthly cost, plus a platform
+  governance summary — so an agent gets what's trustworthy and what it costs.
+
+**Phase 2 (M1–M6) complete.** The Taro control center: ingest a dbt project →
+score it against the principles → attribute cost per arm → audit & remediate →
+per-arm panels with content + trend → serve governed context to agents.
 

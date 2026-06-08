@@ -12,6 +12,29 @@ one linked knowledge graph. Full spec in `docs/SPEC.md`, build order in
 (coherence over collection; nodes carry meaning + grain; concepts are the
 semantic layer; capture the why; model for humans *and* machines).
 
+## Phase 2 — Taro control center (2026-06, complete, on `main`)
+A new top-level **Taro** section: the AE control center where the wiki's
+principles meet the real platform. Plan in `docs/PHASE2-TARO-CONTROL-CENTER.md`.
+Migration `0004` (domains, conformance, remediation, FinOps cost tables,
+import_runs). **M1–M6 done & deployed:**
+- **M1** dbt artifact importer (`src/lib/ingest/dbt.ts` + `src/db/queries/ingest.ts`,
+  upsert by dbt `unique_id` w/ name fallback) + owner `/taro/import`; `/taro`
+  control-center landing; 6 arms (domains = cost centers) seeded + assigned.
+- **M2** conformance engine (`src/lib/conformance/`, 12 checks → wiki principles)
+  + `/taro/conformance` scorecard; platform + per-arm scores.
+- **M3** FinOps: configurable cost functions (`cost_configs` per-source + global
+  compute, `src/lib/cost/`), per-arm budget vs actual (`/taro/cost`), backfill
+  predictor, owner editor (`/taro/cost/config`), token/LLM cost (Claude API source).
+- **M4** audit (`/taro/audit`, findings from failing checks) + remediation
+  (`/taro/remediation`, auto-close on pass).
+- **M5** per-arm panels (`/taro/domains/[slug]`: content + score + trend + cost +
+  gaps + DoD); conformance snapshots + trend sparklines.
+- **M6** semantics governance (`/taro/metrics`) + governance-aware `/api/context`
+  (per-node arm/conformance/cost + platform summary).
+- Seeds: `seed_domains.sql`, `seed_cost.sql`, `seed_domain_content.sql` (data-only,
+  applied via Supabase MCP). Next: dbt-importer round-trip vs the live catalog;
+  richer per-domain content editing; warehouse-real cost ingestion.
+
 ## Active re-plan (2026-06)
 Adopted `DESIGN-PRINCIPLES.md` and re-planned M2–M4 around it (BUILD-PLAN §4):
 catalog gains **grain on sources** + definition-led readers + **decision↔node
