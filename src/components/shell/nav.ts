@@ -2,6 +2,7 @@ import {
   BookOpen,
   Boxes,
   Compass,
+  Gauge,
   GitBranch,
   Library,
   Network,
@@ -60,6 +61,17 @@ export const navSections: NavSection[] = [
       { label: "Graph", href: "/graph", icon: Waypoints },
       { label: "Query", href: "/query", icon: Terminal },
       { label: "Search", href: "/search", icon: Search },
+    ],
+  },
+  {
+    title: "Taro",
+    items: [
+      {
+        label: "Control center",
+        href: "/taro",
+        icon: Gauge,
+        match: (p) => p === "/taro" || p.startsWith("/taro/"),
+      },
     ],
   },
   {

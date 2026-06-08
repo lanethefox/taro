@@ -142,6 +142,15 @@ Node score = weighted pass rate; domain score = rollup; platform score = rollup.
   drivers entered/imported; model `run_seconds` from `run_results.json`).
   Applying the config to usage yields `costFacts`, rolled up source/model →
   domain (cost center) → platform.
+- **Token / LLM cost**: AI token spend is just another configurable cost function
+  in the same model — no schema change. An AI provider (Claude, the dbt MCP /
+  text-to-SQL path, an agent) is a cost node whose `unit` is tokens (or
+  input/output tokens), with a per-unit or tiered `perUnitRate` in `costConfigs`;
+  `costUsage` records tokens consumed per period, attributed to the arm that
+  consumed them. As Taro serves governed context to agents (M6 / "serving data to
+  AI agents"), the tokens those agents burn roll into the same per-arm cost
+  centers as warehouse compute and ingestion. So FinOps covers the whole bill:
+  ingestion (per-source functions) + transformation (compute) + serving (tokens).
 - **Backfill prediction**: a pure estimator (`src/lib/cost/backfill.ts`) shows the
   predicted cost of a backfill at **column, model, and source** level before you
   run it — config × the units a backfill would reprocess (over a chosen window,
@@ -233,7 +242,13 @@ migrations generated with drizzle-kit and applied via the Supabase MCP.
 
 ## 10. Build status
 
-- **M1 (in progress)** — phase-2 data model (this commit), then the dbt
-  round-trip importer, `/taro` nav + shell, domains seed + assignment.
-- M2–M6 follow per §8.
+- **M1 (mostly done)** — phase-2 data model (migration 0004, applied); the dbt
+  artifact **importer** (`src/lib/ingest/dbt.ts` parser, smoke-tested +
+  `src/db/queries/ingest.ts` apply, upsert by `dbt unique_id` with name
+  fallback); `/taro` **nav + control-center landing** (platform overview + arms)
+  and owner-only `/taro/import` (analyze + apply); the **arms seeded** (6 domains
+  linked to their wiki sections). Remaining: the demo round-trip export
+  (generate artifacts from the live catalog and re-import to verify) and a
+  domain-assignment UI.
+- M2–M6 follow per §8. FinOps (M3) covers ingestion + compute + token/LLM cost.
 
