@@ -1,13 +1,23 @@
 import "server-only";
 
+import { randomUUID } from "node:crypto";
 import { inArray } from "drizzle-orm";
 
 import { db } from "@/db";
-import { columns, links, modelDependencies, models, pages, sources } from "@/db/schema";
+import {
+  columns,
+  conformanceResults,
+  links,
+  modelDependencies,
+  models,
+  pages,
+  sources,
+} from "@/db/schema";
 import {
   CHECKS,
   evaluateNode,
   type CheckResult,
+  type CheckStatus,
   type ConformanceColumn,
   type ConformanceNode,
 } from "@/lib/conformance/checks";
@@ -257,4 +267,83 @@ export async function getConformanceReport(
   }));
 
   return { platformScore, nodes, domainScores, checks };
+}
+
+/* -------------------------------------------------------------------------- */
+/* Snapshots & trend                                                           */
+/* -------------------------------------------------------------------------- */
+
+/** Persist the current per-node check results as one run (for trend). */
+export async function snapshotConformance(includePrivate: boolean): Promise<{ runId: string; count: number }> {
+  const report = await getConformanceReport({ includePrivate });
+  const runId = randomUUID();
+  const rows = report.nodes.flatMap((n) =>
+    n.results
+      .filter((r) => r.status !== "na")
+      .map((r) => ({ runId, nodeType: n.type, nodeId: n.id, checkKey: r.key, status: r.status })),
+  );
+  if (rows.length > 0) await db.insert(conformanceResults).values(rows);
+  return { runId, count: rows.length };
+}
+
+export type TrendPoint = { runAt: Date; platform: number; byDomain: Record<string, number> };
+
+/** Platform + per-arm score over the most recent snapshot runs (oldest→newest). */
+export async function getConformanceTrend(limit = 12): Promise<TrendPoint[]> {
+  const rows = await db
+    .select({
+      runId: conformanceResults.runId,
+      nodeType: conformanceResults.nodeType,
+      nodeId: conformanceResults.nodeId,
+      checkKey: conformanceResults.checkKey,
+      status: conformanceResults.status,
+      runAt: conformanceResults.runAt,
+    })
+    .from(conformanceResults);
+  if (rows.length === 0) return [];
+
+  const [m, s] = await Promise.all([
+    db.select({ id: models.id, domainId: models.domainId }).from(models),
+    db.select({ id: sources.id, domainId: sources.domainId }).from(sources),
+  ]);
+  const domainByNode = new Map<string, string | null>();
+  for (const x of m) domainByNode.set(`model:${x.id}`, x.domainId);
+  for (const x of s) domainByNode.set(`source:${x.id}`, x.domainId);
+
+  // Group: runId -> node key -> results; track runAt per run.
+  const runs = new Map<string, { runAt: Date; nodes: Map<string, CheckResult[]> }>();
+  for (const r of rows) {
+    let run = runs.get(r.runId);
+    if (!run) {
+      run = { runAt: r.runAt, nodes: new Map() };
+      runs.set(r.runId, run);
+    }
+    if (r.runAt > run.runAt) run.runAt = r.runAt;
+    const key = `${r.nodeType}:${r.nodeId}`;
+    const list = run.nodes.get(key) ?? [];
+    list.push({ key: r.checkKey, status: r.status as CheckStatus });
+    run.nodes.set(key, list);
+  }
+
+  const points: TrendPoint[] = [...runs.values()]
+    .sort((a, b) => a.runAt.getTime() - b.runAt.getTime())
+    .map((run) => {
+      const nodeScores: number[] = [];
+      const byDomainScores = new Map<string, number[]>();
+      for (const [key, results] of run.nodes) {
+        const score = scoreNode(results).score;
+        nodeScores.push(score);
+        const domainId = domainByNode.get(key);
+        if (domainId) {
+          const arr = byDomainScores.get(domainId) ?? [];
+          arr.push(score);
+          byDomainScores.set(domainId, arr);
+        }
+      }
+      const byDomain: Record<string, number> = {};
+      for (const [d, arr] of byDomainScores) byDomain[d] = rollupScore(arr) ?? 0;
+      return { runAt: run.runAt, platform: rollupScore(nodeScores) ?? 0, byDomain };
+    });
+
+  return points.slice(-limit);
 }

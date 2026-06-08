@@ -37,6 +37,8 @@ export type CostReport = {
   arms: ArmCost[];
   byLayer: { layer: string; cost: number }[];
   topSpenders: CostNode[];
+  /** Every costed node (catalog is small) — lets a domain panel slice its own spend. */
+  nodes: CostNode[];
   currency: string;
 };
 
@@ -175,6 +177,7 @@ export async function getCostReport(
     arms,
     byLayer,
     topSpenders,
+    nodes,
     currency: cfg.global.currency,
   };
 }
