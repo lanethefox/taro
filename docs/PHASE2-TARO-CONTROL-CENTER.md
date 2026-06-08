@@ -242,13 +242,18 @@ migrations generated with drizzle-kit and applied via the Supabase MCP.
 
 ## 10. Build status
 
-- **M1 (mostly done)** — phase-2 data model (migration 0004, applied); the dbt
-  artifact **importer** (`src/lib/ingest/dbt.ts` parser, smoke-tested +
-  `src/db/queries/ingest.ts` apply, upsert by `dbt unique_id` with name
-  fallback); `/taro` **nav + control-center landing** (platform overview + arms)
-  and owner-only `/taro/import` (analyze + apply); the **arms seeded** (6 domains
-  linked to their wiki sections). Remaining: the demo round-trip export
-  (generate artifacts from the live catalog and re-import to verify) and a
-  domain-assignment UI.
-- M2–M6 follow per §8. FinOps (M3) covers ingestion + compute + token/LLM cost.
+- **M1 (done)** — phase-2 data model (migration 0004); dbt artifact importer
+  (parser + apply); `/taro` nav + control-center landing; owner-only
+  `/taro/import`; six arms seeded and assigned.
+- **M2 (done)** — conformance engine (12 checks → principles) + scoring/rollups;
+  `/taro/conformance` scorecard with per-node drill-in; platform + per-arm scores
+  on the control center.
+- **M3 (done)** — FinOps. Configurable cost functions (`cost_configs` per-source
+  + global compute), usage → cost (`src/lib/cost/compute.ts`, smoke-tested),
+  per-arm budget-vs-actual + by-layer + top spenders (`/taro/cost`), the
+  **backfill predictor** (`src/lib/cost/backfill.ts`) at source/model/column
+  level, an owner cost-function **editor** (`/taro/cost/config`), and **token/LLM
+  cost** modeled as a Claude API source with a per-token function.
+- **M4–M6** follow per §8 (audit + remediation; domain panels + content + trend;
+  metrics governance + agent context).
 
