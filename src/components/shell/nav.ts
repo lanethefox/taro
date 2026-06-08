@@ -30,6 +30,17 @@ export type NavSection = {
 
 export const navSections: NavSection[] = [
   {
+    title: "Taro",
+    items: [
+      {
+        label: "Control center",
+        href: "/taro",
+        icon: Gauge,
+        match: (p) => p === "/taro" || p.startsWith("/taro/"),
+      },
+    ],
+  },
+  {
     title: "Knowledge",
     items: [
       { label: "Wiki", href: "/wiki", icon: BookOpen },
@@ -61,17 +72,6 @@ export const navSections: NavSection[] = [
       { label: "Graph", href: "/graph", icon: Waypoints },
       { label: "Query", href: "/query", icon: Terminal },
       { label: "Search", href: "/search", icon: Search },
-    ],
-  },
-  {
-    title: "Taro",
-    items: [
-      {
-        label: "Control center",
-        href: "/taro",
-        icon: Gauge,
-        match: (p) => p === "/taro" || p.startsWith("/taro/"),
-      },
     ],
   },
   {
