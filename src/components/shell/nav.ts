@@ -13,6 +13,7 @@ import {
   ScanSearch,
   ScrollText,
   Search,
+  Shapes,
   Sparkles,
   Terminal,
   Waypoints,
@@ -45,6 +46,7 @@ export const navSections: NavSection[] = [
       { label: "Conformance", href: "/taro/conformance", icon: ClipboardCheck },
       { label: "Audit", href: "/taro/audit", icon: ScanSearch },
       { label: "Remediation", href: "/taro/remediation", icon: ClipboardList },
+      { label: "Semantics", href: "/taro/metrics", icon: Shapes },
       {
         label: "Cost",
         href: "/taro/cost",

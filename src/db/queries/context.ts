@@ -3,8 +3,10 @@ import "server-only";
 import { asc, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { columns, models, pages, sources, type Column } from "@/db/schema";
+import { columns, domains, models, pages, sources, type Column } from "@/db/schema";
 import { listRelationships } from "@/db/queries/erd";
+import { getConformanceReport } from "@/db/queries/conformance";
+import { getCostReport } from "@/db/queries/cost";
 import { excerpt, type JSONContent } from "@/lib/content";
 
 type Vis = "private" | "viewer" | "public";
@@ -16,29 +18,30 @@ function colTests(c: Column): string[] {
 }
 
 /**
- * The machine-readable context bundle (BUILD-PLAN M4 north star): definitions +
- * grain + structure + relationships as one JSON document, so an agent/LLM can
- * consume taro's meaning without scraping pages. Visibility-filtered.
+ * The machine-readable context bundle (BUILD-PLAN M4 north star), now governance-
+ * aware: definitions + grain + structure + relationships, plus per-node arm,
+ * conformance (score + open gaps), and monthly cost, and a platform governance
+ * summary — so an agent knows not just the shape of the data but what's
+ * trustworthy and what it costs. Visibility-filtered.
  */
 export async function getContextBundle(owner: boolean) {
   const show = (v: Vis) => owner || v !== "private";
 
-  const [conceptRows, modelRows, sourceRows, colRows, rels] = await Promise.all([
-    db
-      .select({
-        title: pages.title,
-        slug: pages.slug,
-        content: pages.content,
-        visibility: pages.visibility,
-      })
-      .from(pages)
-      .where(eq(pages.kind, "concept"))
-      .orderBy(asc(pages.title)),
-    db.select().from(models).orderBy(asc(models.name)),
-    db.select().from(sources).orderBy(asc(sources.name)),
-    db.select().from(columns),
-    listRelationships(),
-  ]);
+  const [conceptRows, modelRows, sourceRows, colRows, rels, domainRows, conformance, cost] =
+    await Promise.all([
+      db
+        .select({ title: pages.title, slug: pages.slug, content: pages.content, visibility: pages.visibility })
+        .from(pages)
+        .where(eq(pages.kind, "concept"))
+        .orderBy(asc(pages.title)),
+      db.select().from(models).orderBy(asc(models.name)),
+      db.select().from(sources).orderBy(asc(sources.name)),
+      db.select().from(columns),
+      listRelationships(),
+      db.select({ id: domains.id, name: domains.name, budget: domains.monthlyBudget }).from(domains),
+      getConformanceReport({ includePrivate: owner }),
+      getCostReport({ includePrivate: owner }),
+    ]);
 
   const colsByParent = new Map<string, Column[]>();
   for (const c of colRows) {
@@ -57,12 +60,42 @@ export async function getContextBundle(owner: boolean) {
         tests: colTests(c),
       }));
 
-  const visibleModelIds = new Set(
-    modelRows.filter((m) => show(m.visibility)).map((m) => m.id),
+  const domainName = new Map(domainRows.map((d) => [d.id, d.name]));
+  const checkTitle = new Map(conformance.checks.map((c) => [c.key, c.title]));
+  const conformanceByNode = new Map(
+    conformance.nodes.map((n) => [
+      `${n.type}:${n.id}`,
+      {
+        score: n.score,
+        gaps: n.results
+          .filter((r) => r.status === "fail" || r.status === "warn")
+          .map((r) => checkTitle.get(r.key) ?? r.key),
+      },
+    ]),
   );
+  const costByNode = new Map(cost.nodes.map((n) => [`${n.type}:${n.id}`, n.cost]));
+
+  const governanceFor = (type: "model" | "source", id: string, domainId: string | null) => ({
+    arm: domainId ? domainName.get(domainId) ?? null : null,
+    conformance: conformanceByNode.get(`${type}:${id}`) ?? null,
+    monthlyCost: costByNode.get(`${type}:${id}`) ?? null,
+  });
+
+  const visibleModelIds = new Set(modelRows.filter((m) => show(m.visibility)).map((m) => m.id));
 
   return {
     generatedAt: new Date().toISOString(),
+    governance: {
+      platformConformance: conformance.platformScore,
+      monthlySpend: cost.total,
+      monthlyBudget: cost.totalBudget,
+      arms: domainRows.map((d) => ({
+        name: d.name,
+        conformance: conformance.domainScores[d.id] ?? null,
+        monthlySpend: cost.arms.find((a) => a.domainId === d.id)?.actual ?? 0,
+        monthlyBudget: d.budget === null ? null : Number(d.budget),
+      })),
+    },
     concepts: conceptRows
       .filter((c) => show(c.visibility))
       .map((c) => ({
@@ -77,6 +110,7 @@ export async function getContextBundle(owner: boolean) {
         system: s.system,
         grain: s.grain,
         description: s.description,
+        ...governanceFor("source", s.id, s.domainId),
         columns: colsFor("source", s.id),
       })),
     models: modelRows
@@ -87,12 +121,11 @@ export async function getContextBundle(owner: boolean) {
         materialization: m.materialization,
         grain: m.grain,
         description: m.description,
+        ...governanceFor("model", m.id, m.domainId),
         columns: colsFor("model", m.id),
       })),
     relationships: rels
-      .filter(
-        (r) => visibleModelIds.has(r.fromModelId) && visibleModelIds.has(r.toModelId),
-      )
+      .filter((r) => visibleModelIds.has(r.fromModelId) && visibleModelIds.has(r.toModelId))
       .map((r) => ({
         from: { model: r.fromModelName, column: r.fromColumnName },
         to: { model: r.toModelName, column: r.toColumnName },
