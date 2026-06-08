@@ -11,6 +11,12 @@ import {
 import type { DomainWithCounts, PlatformOverview } from "@/db/queries/taro";
 import { Button } from "@/components/ui/button";
 
+function scoreColor(score: number): string {
+  if (score >= 80) return "text-sage";
+  if (score >= 50) return "text-wheat";
+  return "text-terracotta";
+}
+
 function Stat({
   label,
   value,
@@ -44,10 +50,14 @@ export function ControlCenter({
   overview,
   domains,
   owner,
+  platformScore,
+  domainScores,
 }: {
   overview: PlatformOverview;
   domains: DomainWithCounts[];
   owner: boolean;
+  platformScore: number | null;
+  domainScores: Record<string, number>;
 }) {
   const lastImport = overview.lastImportAt
     ? new Date(overview.lastImportAt).toLocaleDateString("en-US", {
@@ -74,12 +84,24 @@ export function ControlCenter({
             </p>
           </div>
         </div>
-        {owner ? (
-          <Button variant="outline" render={<Link href="/taro/import" />}>
-            <Upload className="size-4" />
-            Import dbt
-          </Button>
-        ) : null}
+        <div className="flex items-center gap-4">
+          {platformScore !== null ? (
+            <Link href="/taro/conformance" className="text-right">
+              <div
+                className={`text-3xl font-semibold tabular-nums ${scoreColor(platformScore)}`}
+              >
+                {platformScore}
+              </div>
+              <div className="text-xs text-muted-foreground">conformance</div>
+            </Link>
+          ) : null}
+          {owner ? (
+            <Button variant="outline" render={<Link href="/taro/import" />}>
+              <Upload className="size-4" />
+              Import dbt
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       <section className="mb-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -94,11 +116,19 @@ export function ControlCenter({
           <h2 className="text-sm font-medium text-muted-foreground">
             Arms of the business
           </h2>
-          {overview.unassignedModels > 0 ? (
-            <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-              {overview.unassignedModels} models unassigned
-            </span>
-          ) : null}
+          <div className="flex items-center gap-3">
+            {overview.unassignedModels > 0 ? (
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                {overview.unassignedModels} models unassigned
+              </span>
+            ) : null}
+            <Link
+              href="/taro/conformance"
+              className="text-xs text-primary hover:underline"
+            >
+              Scorecard →
+            </Link>
+          </div>
         </div>
 
         {domains.length === 0 ? (
@@ -110,19 +140,30 @@ export function ControlCenter({
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {domains.map((d) => {
               const budget = fmtBudget(d.monthlyBudget);
+              const score = domainScores[d.id];
               return (
                 <div key={d.id} className="tile flex flex-col gap-3 p-5">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-medium tracking-tight">{d.name}</h3>
-                    {d.conceptSlug ? (
-                      <Link
-                        href={`/wiki/${d.conceptSlug}`}
-                        className="text-muted-foreground hover:text-primary"
-                        title="Open wiki section"
-                      >
-                        <ArrowUpRight className="size-4 shrink-0" />
-                      </Link>
-                    ) : null}
+                    <div className="flex items-center gap-2">
+                      {score !== undefined ? (
+                        <span
+                          className={`text-sm font-semibold tabular-nums ${scoreColor(score)}`}
+                          title="Conformance"
+                        >
+                          {score}
+                        </span>
+                      ) : null}
+                      {d.conceptSlug ? (
+                        <Link
+                          href={`/wiki/${d.conceptSlug}`}
+                          className="text-muted-foreground hover:text-primary"
+                          title="Open wiki section"
+                        >
+                          <ArrowUpRight className="size-4 shrink-0" />
+                        </Link>
+                      ) : null}
+                    </div>
                   </div>
                   {d.description ? (
                     <p className="line-clamp-2 text-xs text-muted-foreground">
