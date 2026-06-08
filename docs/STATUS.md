@@ -166,6 +166,21 @@ stays as-is; the principle-driven additions land next.
   `seed-wiki.mjs` were edited to drop the retired node (regenerate seed_wiki.sql
   with `node supabase/seed-wiki.mjs > supabase/seed_wiki.sql`). Generator
   `/tmp/gen-ae.mjs` (not committed). Research was 2026-source-prioritized.
+- **Tenth top-level tree: `Modernizing dbt`** (2026-06). A focused practitioner
+  playbook for cleaning up / modernizing a sprawling dbt project (the "thousands
+  of models, no canonical core" scenario), distinct from `Transformation and
+  orchestration` (intro-level dbt) and cross-linked to it + `Analytics
+  engineering` + ops. **15 pages**: root + sprawl/anti-patterns, auditing
+  (dbt_project_evaluator, lineage, unused-model detection, cost attribution),
+  designing the canonical core, planning (strangler-fig) + executing
+  (audit_helper/data-diff parity, slim CI), materialization & incremental
+  strategy, the metrics layer (MetricFlow), preventing re-sprawl, dbt Mesh, dbt
+  cost & economics, the tooling belt, ownership, and voices/canon. Seeded via the
+  Supabase MCP; reproducible seed `supabase/seed_modernizing_dbt.sql` (self-
+  contained, idempotent — all cross-links target pre-existing pages). Generator
+  `/tmp/gen-mdbt.mjs` (not committed). 2026-source-prioritized; vendor cost
+  figures flagged. Verified live: **10 top-level sections, 0 unresolved
+  wikilinks**.
 - The agent has **no DB access from the sandbox** unless a Supabase MCP server
   or `DATABASE_URL` env secret is configured. Generate migrations with
   `pnpm drizzle-kit generate` (no DB needed); the user (or the Supabase MCP)
