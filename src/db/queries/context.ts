@@ -7,6 +7,7 @@ import { columns, domains, models, pages, sources, type Column } from "@/db/sche
 import { listRelationships } from "@/db/queries/erd";
 import { getConformanceReport } from "@/db/queries/conformance";
 import { getCostReport } from "@/db/queries/cost";
+import { getSemanticLayer } from "@/db/queries/metrics";
 import { excerpt, type JSONContent } from "@/lib/content";
 
 type Vis = "private" | "viewer" | "public";
@@ -42,6 +43,8 @@ export async function getContextBundle(owner: boolean) {
       getConformanceReport({ includePrivate: owner }),
       getCostReport({ includePrivate: owner }),
     ]);
+
+  const semantic = await getSemanticLayer({ includePrivate: owner });
 
   const colsByParent = new Map<string, Column[]>();
   for (const c of colRows) {
@@ -103,6 +106,16 @@ export async function getContextBundle(owner: boolean) {
         slug: c.slug,
         definition: excerpt(c.content as JSONContent | null, 800),
       })),
+    metrics: semantic.metrics.map((m) => ({
+      name: m.name,
+      type: m.type,
+      definition:
+        m.type === "ratio"
+          ? `${m.numeratorName} / ${m.denominatorName}`
+          : m.expression,
+      model: m.modelName,
+      arm: m.domainName,
+    })),
     sources: sourceRows
       .filter((s) => show(s.visibility))
       .map((s) => ({

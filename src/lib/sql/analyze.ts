@@ -7,6 +7,15 @@
  */
 import { CANONICAL_METRICS } from "./metrics";
 
+/** A metric from the semantic layer, with patterns that detect it being recomputed. */
+export type MetricRef = { name: string; owner: string; patterns: RegExp[] };
+
+const DEFAULT_METRICS: MetricRef[] = CANONICAL_METRICS.map((m) => ({
+  name: m.label,
+  owner: m.owner,
+  patterns: m.patterns,
+}));
+
 export type IssueCode =
   | "god_model"
   | "duplicate_metric"
@@ -70,7 +79,10 @@ export function sqlMetrics(sql: string): SqlMetrics {
   };
 }
 
-export function analyzeSql(ctx: SqlContext): SqlIssue[] {
+export function analyzeSql(
+  ctx: SqlContext,
+  metricRegistry: MetricRef[] = DEFAULT_METRICS,
+): SqlIssue[] {
   const issues: SqlIssue[] = [];
   const sql = ctx.sql ?? "";
   if (sql.trim().length === 0) return issues;
@@ -88,18 +100,18 @@ export function analyzeSql(ctx: SqlContext): SqlIssue[] {
     });
   }
 
-  // Recomputed canonical metrics.
-  for (const metric of CANONICAL_METRICS) {
-    if (ctx.name === metric.owner) continue;
+  // Recomputed metrics from the semantic layer.
+  for (const metric of metricRegistry) {
+    if (!metric.owner || ctx.name === metric.owner) continue;
     const hit = metric.patterns.find((p) => p.test(s));
     if (hit) {
       issues.push({
         code: "duplicate_metric",
         severity: "error",
-        title: `Recomputes ${metric.label}`,
-        detail: `${metric.label} should be defined once in ${metric.owner}; this model recomputes it.`,
+        title: `Recomputes ${metric.name}`,
+        detail: `${metric.name} should be defined once in ${metric.owner}; this model recomputes it.`,
         evidence: hit.source,
-        metric: metric.key,
+        metric: metric.name,
         owner: metric.owner,
       });
     }

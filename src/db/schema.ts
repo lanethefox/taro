@@ -151,6 +151,12 @@ export const costUsageSourceEnum = pgEnum("cost_usage_source", [
   "run_results",
   "import",
 ]);
+export const metricTypeEnum = pgEnum("metric_type", [
+  "simple",
+  "ratio",
+  "derived",
+  "cumulative",
+]);
 
 /* -------------------------------------------------------------------------- */
 /* Auth / identity                                                             */
@@ -728,6 +734,46 @@ export const costFacts = pgTable(
   ],
 );
 
+/**
+ * The semantic layer (MetricFlow-shaped): each metric is defined once, owned by a
+ * model, with a measure `expression` and a `type`. This is the structured
+ * definition layer (distinct from the wiki, which holds the prose/principles) —
+ * governed in /taro/metrics, served to agents via /api/context, and used by the
+ * SQL analyzer to detect models that recompute a metric instead of referencing it.
+ */
+export const metrics = pgTable(
+  "metrics",
+  {
+    id: id(),
+    name: text("name").notNull(),
+    label: text("label"),
+    description: text("description"),
+    type: metricTypeEnum("type").notNull().default("simple"),
+    /** The model that owns this metric (its canonical home / grain). */
+    modelId: uuid("model_id").references((): typeof models.id => models.id, {
+      onDelete: "set null",
+    }),
+    /** The measure expression, e.g. `sum(amount)` or `count(distinct student_id)`. */
+    expression: text("expression"),
+    /** Regex source the analyzer uses to spot this metric being recomputed elsewhere. */
+    detect: text("detect"),
+    numeratorId: uuid("numerator_id"),
+    denominatorId: uuid("denominator_id"),
+    window: text("window"),
+    domainId: uuid("domain_id").references(() => domains.id, {
+      onDelete: "set null",
+    }),
+    ownerId: uuid("owner_id"),
+    visibility: visibilityEnum("visibility").notNull().default("private"),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("metrics_name_idx").on(t.name),
+    index("metrics_model_idx").on(t.modelId),
+    index("metrics_domain_idx").on(t.domainId),
+  ],
+);
+
 /** Audit of each dbt artifact import. */
 export const importRuns = pgTable("import_runs", {
   id: id(),
@@ -767,6 +813,8 @@ export type Remediation = typeof remediations.$inferSelect;
 export type CostConfig = typeof costConfigs.$inferSelect;
 export type CostUsage = typeof costUsage.$inferSelect;
 export type CostFact = typeof costFacts.$inferSelect;
+export type Metric = typeof metrics.$inferSelect;
+export type MetricType = (typeof metricTypeEnum.enumValues)[number];
 export type ImportRun = typeof importRuns.$inferSelect;
 export type ConformanceStatus = (typeof conformanceStatusEnum.enumValues)[number];
 export type RemediationStatus = (typeof remediationStatusEnum.enumValues)[number];

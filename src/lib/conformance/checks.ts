@@ -5,10 +5,13 @@
  * links to "how to fix it". Pure and dependency-free (smoke-testable).
  */
 
-import { analyzeSql, hasBlockingIssues } from "@/lib/sql/analyze";
+import { analyzeSql, hasBlockingIssues, type MetricRef } from "@/lib/sql/analyze";
 
 export type CheckStatus = "pass" | "fail" | "warn" | "na";
 export type AppliesTo = "model" | "source" | "both";
+
+/** Extra context a check may use — e.g. the semantic layer for SQL analysis. */
+export type EvalOpts = { metrics?: MetricRef[] };
 
 export type ConformanceColumn = {
   name: string;
@@ -48,7 +51,7 @@ export type CheckDef = {
   weight: number;
   principleTitle: string | null;
   /** Returns pass/fail (or warn for soft checks). `na` is derived from appliesTo. */
-  evaluate: (n: ConformanceNode) => boolean;
+  evaluate: (n: ConformanceNode, opts?: EvalOpts) => boolean;
 };
 
 const has = (s: string | null | undefined): boolean => Boolean(s && s.trim().length > 0);
@@ -180,8 +183,11 @@ export const CHECKS: CheckDef[] = [
     severity: "error",
     weight: 2,
     principleTitle: "dbt anti-patterns",
-    evaluate: (n) =>
-      !n.sql || !hasBlockingIssues(analyzeSql({ name: n.name, layer: n.layer, sql: n.sql })),
+    evaluate: (n, opts) =>
+      !n.sql ||
+      !hasBlockingIssues(
+        analyzeSql({ name: n.name, layer: n.layer, sql: n.sql }, opts?.metrics),
+      ),
   },
   {
     key: "freshness",
@@ -202,10 +208,10 @@ function applies(check: CheckDef, type: "model" | "source"): boolean {
 export type CheckResult = { key: string; status: CheckStatus };
 
 /** Run every check against a node. Inapplicable checks return `na`. */
-export function evaluateNode(node: ConformanceNode): CheckResult[] {
+export function evaluateNode(node: ConformanceNode, opts?: EvalOpts): CheckResult[] {
   return CHECKS.map((check) => {
     if (!applies(check, node.type)) return { key: check.key, status: "na" as const };
-    const ok = check.evaluate(node);
+    const ok = check.evaluate(node, opts);
     if (ok) return { key: check.key, status: "pass" as const };
     return { key: check.key, status: check.severity === "warn" ? "warn" : "fail" };
   });

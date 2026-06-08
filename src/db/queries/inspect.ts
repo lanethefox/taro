@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { domains, models } from "@/db/schema";
 import { analyzeSql, type SqlIssue } from "@/lib/sql/analyze";
 import { recommend, type DecompositionPlan } from "@/lib/sql/decompose";
+import { getMetricRegistry } from "@/db/queries/metrics";
 
 export type ModelInspection = {
   id: string;
@@ -36,7 +37,8 @@ export async function getModelInspection(id: string): Promise<ModelInspection | 
   if (!m) return null;
 
   const ctx = { name: m.name, layer: m.layer, sql: m.sql ?? "" };
-  const issues = m.sql ? analyzeSql(ctx) : [];
+  const registry = await getMetricRegistry();
+  const issues = m.sql ? analyzeSql(ctx, registry) : [];
   const plan = m.sql && issues.length > 0 ? recommend(issues, ctx) : null;
 
   return {
