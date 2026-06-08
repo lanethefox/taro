@@ -6,6 +6,7 @@ import { z } from "zod";
 import { requireOwner } from "@/lib/auth";
 import {
   createRemediation,
+  generateLegacyRemediations,
   reconcileRemediations,
   setRemediationStatus,
 } from "@/db/queries/remediation";
@@ -62,4 +63,14 @@ export async function recheckRemediationsAction(): Promise<RecheckResult> {
   revalidatePath("/taro/remediation");
   revalidatePath("/taro/audit");
   return { ok: true, closed };
+}
+
+export type ScanResult = { ok: true; created: number } | { ok: false; error: string };
+
+/** Auto-catch legacy models (clean_sql failures) onto the backlog. */
+export async function scanLegacyAction(): Promise<ScanResult> {
+  await requireOwner();
+  const created = await generateLegacyRemediations(true);
+  revalidatePath("/taro/remediation");
+  return { ok: true, created };
 }

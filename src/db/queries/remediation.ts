@@ -154,3 +154,32 @@ export async function reconcileRemediations(includePrivate: boolean): Promise<nu
     );
   return toClose.length;
 }
+
+/**
+ * Auto-catch: create remediations for models whose SQL fails the `clean_sql`
+ * check (the legacy/decomposition candidates), deduped against active ones.
+ * Returns the number created.
+ */
+export async function generateLegacyRemediations(includePrivate: boolean): Promise<number> {
+  const [report, active] = await Promise.all([
+    getConformanceReport({ includePrivate }),
+    getActiveRemediationKeys(),
+  ]);
+  const toCreate = report.nodes
+    .filter(
+      (n) =>
+        n.type === "model" &&
+        n.results.some((r) => r.key === "clean_sql" && r.status === "fail") &&
+        !active.has(`model:${n.id}:clean_sql`),
+    )
+    .map((n) => ({
+      nodeType: "model" as const,
+      nodeId: n.id,
+      checkKey: "clean_sql",
+      title: `Decompose ${n.name}`,
+      domainId: n.domainId,
+      status: "open" as const,
+    }));
+  if (toCreate.length > 0) await db.insert(remediations).values(toCreate);
+  return toCreate.length;
+}

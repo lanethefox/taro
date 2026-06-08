@@ -2,12 +2,13 @@
 
 import { useTransition } from "react";
 import Link from "next/link";
-import { ClipboardList, Loader2, RefreshCw } from "lucide-react";
+import { ClipboardList, FlaskConical, Loader2, RefreshCw, ScanSearch } from "lucide-react";
 import { toast } from "sonner";
 
 import type { RemediationStatus, RemediationView } from "@/db/queries/remediation";
 import {
   recheckRemediationsAction,
+  scanLegacyAction,
   setRemediationStatusAction,
 } from "@/app/(app)/taro/remediation/actions";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,15 @@ function Item({ r, owner }: { r: RemediationView; owner: boolean }) {
           {r.checkTitle ? <span>· {r.checkTitle}</span> : null}
         </div>
       </div>
+      {r.checkKey === "clean_sql" && r.nodeType === "model" ? (
+        <Link
+          href={`/taro/decompose/${r.nodeId}`}
+          className="inline-flex shrink-0 items-center gap-1 rounded-md border border-input px-2 py-1 text-xs text-primary hover:bg-muted"
+        >
+          <FlaskConical className="size-3" />
+          Inspect
+        </Link>
+      ) : null}
       {owner ? (
         <select
           value={r.status}
@@ -84,6 +94,15 @@ export function RemediationBoard({
     });
   }
 
+  function scan() {
+    start(async () => {
+      const res = await scanLegacyAction();
+      if (res.ok)
+        toast.success(res.created > 0 ? `Caught ${res.created} legacy model(s)` : "No new legacy models");
+      else toast.error(res.error);
+    });
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-10">
       <div className="mb-8 flex items-center gap-3">
@@ -97,10 +116,16 @@ export function RemediationBoard({
           </p>
         </div>
         {owner ? (
-          <Button variant="outline" disabled={pending} onClick={recheck}>
-            {pending ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
-            Re-check
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" disabled={pending} onClick={scan}>
+              {pending ? <Loader2 className="size-4 animate-spin" /> : <ScanSearch className="size-4" />}
+              Scan legacy
+            </Button>
+            <Button variant="outline" size="sm" disabled={pending} onClick={recheck}>
+              {pending ? <Loader2 className="size-4 animate-spin" /> : <RefreshCw className="size-4" />}
+              Re-check
+            </Button>
+          </div>
         ) : null}
       </div>
 
