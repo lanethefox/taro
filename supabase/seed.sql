@@ -16,42 +16,11 @@ values
     'concept',
     'viewer',
     '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Dimensional (Kimball), one-big-table, activity schema, data vault, semantic layers, and normalization trade-offs."}]}]}'
-  ),
-  (
-    'Materialization strategies',
-    'materialization-strategies',
-    'concept',
-    'viewer',
-    '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"View vs. table vs. incremental vs. ephemeral — when and why, with cost/performance trade-offs."}]}]}'
-  ),
-  (
-    'Observation strategies',
-    'observation-strategies',
-    'concept',
-    'viewer',
-    '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Freshness, volume, distribution, anomaly detection, contracts, and alerting."}]}]}'
-  ),
-  (
-    'Orchestration strategies',
-    'orchestration-strategies',
-    'concept',
-    'viewer',
-    '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Scheduling, dependency graphs, backfills, CI/CD for transformations, and environments."}]}]}'
-  ),
-  (
-    'Testing & data quality',
-    'testing-and-data-quality',
-    'concept',
-    'viewer',
-    '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Test taxonomy, coverage strategy, and contracts."}]}]}'
-  ),
-  (
-    'ML / AI integration',
-    'ml-ai-integration',
-    'concept',
-    'viewer',
-    '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"Feature/marts hand-off to ML, embeddings & vector stores in the warehouse, LLM-assisted documentation & semantic search."}]}]}'
   )
+-- The former strategy stubs (materialization, observation, orchestration, testing,
+-- ML/AI) were removed when the "Analytics engineering practice" node was retired.
+-- That ground is now covered with full content in supabase/seed_transformation_orchestration.sql
+-- and supabase/seed_analytics_engineering.sql.
 on conflict (slug) do update
   set title = excluded.title,
       kind = excluded.kind,

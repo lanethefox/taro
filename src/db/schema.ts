@@ -15,10 +15,12 @@ import { sql, type SQL } from "drizzle-orm";
 import {
   boolean,
   customType,
+  date,
   doublePrecision,
   index,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   text,
@@ -114,6 +116,41 @@ export const taskStatusEnum = pgEnum("task_status", [
   "done",
 ]);
 export const taskKindEnum = pgEnum("task_kind", ["baseline", "improvement"]);
+
+/* Control center (phase 2) enums */
+export const checkAppliesEnum = pgEnum("check_applies", [
+  "model",
+  "source",
+  "column",
+]);
+export const checkSeverityEnum = pgEnum("check_severity", ["error", "warn"]);
+export const conformanceStatusEnum = pgEnum("conformance_status", [
+  "pass",
+  "warn",
+  "fail",
+  "na",
+]);
+export const remediationStatusEnum = pgEnum("remediation_status", [
+  "open",
+  "in_progress",
+  "done",
+  "wontfix",
+]);
+export const costScopeEnum = pgEnum("cost_scope", [
+  "source",
+  "model",
+  "global",
+]);
+export const costMethodEnum = pgEnum("cost_method", [
+  "flat",
+  "per_unit",
+  "tiered",
+]);
+export const costUsageSourceEnum = pgEnum("cost_usage_source", [
+  "manual",
+  "run_results",
+  "import",
+]);
 
 /* -------------------------------------------------------------------------- */
 /* Auth / identity                                                             */
@@ -279,10 +316,18 @@ export const sources = pgTable(
     freshnessSla: text("freshness_sla"),
     expectedVolume: text("expected_volume"),
     monitoringNotes: text("monitoring_notes"),
+    domainId: uuid("domain_id").references((): typeof domains.id => domains.id, {
+      onDelete: "set null",
+    }),
+    dbtUniqueId: text("dbt_unique_id"),
     visibility: visibilityEnum("visibility").notNull().default("private"),
     ...timestamps,
   },
-  (t) => [index("sources_name_idx").on(t.name)],
+  (t) => [
+    index("sources_name_idx").on(t.name),
+    index("sources_domain_idx").on(t.domainId),
+    uniqueIndex("sources_dbt_unique_idx").on(t.dbtUniqueId),
+  ],
 );
 
 export const models = pgTable(
@@ -301,6 +346,10 @@ export const models = pgTable(
     freshnessSla: text("freshness_sla"),
     expectedVolume: text("expected_volume"),
     monitoringNotes: text("monitoring_notes"),
+    domainId: uuid("domain_id").references((): typeof domains.id => domains.id, {
+      onDelete: "set null",
+    }),
+    dbtUniqueId: text("dbt_unique_id"),
     visibility: visibilityEnum("visibility").notNull().default("private"),
     ...timestamps,
   },
@@ -308,6 +357,8 @@ export const models = pgTable(
     index("models_name_idx").on(t.name),
     index("models_layer_idx").on(t.layer),
     index("models_materialization_idx").on(t.materialization),
+    index("models_domain_idx").on(t.domainId),
+    uniqueIndex("models_dbt_unique_idx").on(t.dbtUniqueId),
   ],
 );
 
@@ -518,6 +569,175 @@ export const caseStudyTasks = pgTable(
 );
 
 /* -------------------------------------------------------------------------- */
+/* Control center (phase 2) — domains, conformance, remediation, FinOps        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * An arm of the business, doubling as a cost center. Catalog nodes are assigned
+ * to a domain; conformance and cost roll up here. `conceptPageId` links the arm
+ * to its wiki section; `content` is its domain-specific editorial.
+ */
+export const domains = pgTable(
+  "domains",
+  {
+    id: id(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description"),
+    content: jsonb("content"),
+    ownerId: uuid("owner_id"),
+    conceptPageId: uuid("concept_page_id").references(() => pages.id, {
+      onDelete: "set null",
+    }),
+    monthlyBudget: numeric("monthly_budget", { precision: 14, scale: 2 }),
+    visibility: visibilityEnum("visibility").notNull().default("private"),
+    position: integer("position").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("domains_slug_idx").on(t.slug)],
+);
+
+/** The conformance rubric — each check maps to a wiki principle page. Seeded. */
+export const conformanceChecks = pgTable(
+  "conformance_checks",
+  {
+    id: id(),
+    key: text("key").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    principlePageId: uuid("principle_page_id").references(() => pages.id, {
+      onDelete: "set null",
+    }),
+    appliesTo: checkAppliesEnum("applies_to").notNull().default("model"),
+    weight: integer("weight").notNull().default(1),
+    severity: checkSeverityEnum("severity").notNull().default("error"),
+    enabled: boolean("enabled").notNull().default(true),
+    ...timestamps,
+  },
+  (t) => [uniqueIndex("conformance_checks_key_idx").on(t.key)],
+);
+
+/** Point-in-time scored result of one check against one node. Kept per run. */
+export const conformanceResults = pgTable(
+  "conformance_results",
+  {
+    id: id(),
+    runId: uuid("run_id").notNull(),
+    nodeType: nodeTypeEnum("node_type").notNull(),
+    nodeId: uuid("node_id").notNull(),
+    checkKey: text("check_key").notNull(),
+    status: conformanceStatusEnum("status").notNull(),
+    detail: text("detail"),
+    runAt: timestamp("run_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("conformance_results_run_idx").on(t.runId),
+    index("conformance_results_node_idx").on(t.nodeType, t.nodeId),
+  ],
+);
+
+/** The AE remediation backlog: a gap to fix, assignable, status-tracked. */
+export const remediations = pgTable(
+  "remediations",
+  {
+    id: id(),
+    nodeType: nodeTypeEnum("node_type").notNull(),
+    nodeId: uuid("node_id").notNull(),
+    checkKey: text("check_key"),
+    title: text("title").notNull(),
+    status: remediationStatusEnum("status").notNull().default("open"),
+    assigneeId: uuid("assignee_id"),
+    domainId: uuid("domain_id").references(() => domains.id, {
+      onDelete: "set null",
+    }),
+    note: text("note"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    index("remediations_status_idx").on(t.status),
+    index("remediations_node_idx").on(t.nodeType, t.nodeId),
+    index("remediations_domain_idx").on(t.domainId),
+  ],
+);
+
+/**
+ * The AE-configurable cost function for a node (or the global compute default).
+ * Sources get a real-world function (Fivetran MAR, Segment MTU, GB, ...); models
+ * inherit the `global` compute rate unless they have their own row.
+ */
+export const costConfigs = pgTable(
+  "cost_configs",
+  {
+    id: id(),
+    scope: costScopeEnum("scope").notNull(),
+    nodeId: uuid("node_id"),
+    unit: text("unit"),
+    method: costMethodEnum("method").notNull().default("per_unit"),
+    fixedCost: numeric("fixed_cost", { precision: 14, scale: 4 }),
+    perUnitRate: numeric("per_unit_rate", { precision: 18, scale: 8 }),
+    tiers: jsonb("tiers"),
+    currency: text("currency").notNull().default("USD"),
+    notes: text("notes"),
+    updatedBy: uuid("updated_by"),
+    ...timestamps,
+  },
+  (t) => [index("cost_configs_scope_node_idx").on(t.scope, t.nodeId)],
+);
+
+/** Measured usage units per node per period (source drivers; model run_seconds). */
+export const costUsage = pgTable(
+  "cost_usage",
+  {
+    id: id(),
+    nodeType: nodeTypeEnum("node_type").notNull(),
+    nodeId: uuid("node_id").notNull(),
+    period: date("period").notNull(),
+    units: numeric("units", { precision: 20, scale: 4 }).notNull().default("0"),
+    source: costUsageSourceEnum("source").notNull().default("manual"),
+    note: text("note"),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("cost_usage_unique_idx").on(t.nodeType, t.nodeId, t.period),
+    index("cost_usage_period_idx").on(t.period),
+  ],
+);
+
+/** Computed cost snapshot per node per period (config applied to usage). */
+export const costFacts = pgTable(
+  "cost_facts",
+  {
+    id: id(),
+    nodeType: nodeTypeEnum("node_type").notNull(),
+    nodeId: uuid("node_id").notNull(),
+    period: date("period").notNull(),
+    cost: numeric("cost", { precision: 18, scale: 4 }).notNull().default("0"),
+    unit: text("unit"),
+    units: numeric("units", { precision: 20, scale: 4 }),
+    computedAt: timestamp("computed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("cost_facts_unique_idx").on(t.nodeType, t.nodeId, t.period),
+    index("cost_facts_node_idx").on(t.nodeType, t.nodeId),
+    index("cost_facts_period_idx").on(t.period),
+  ],
+);
+
+/** Audit of each dbt artifact import. */
+export const importRuns = pgTable("import_runs", {
+  id: id(),
+  fileNames: jsonb("file_names"),
+  counts: jsonb("counts"),
+  importerId: uuid("importer_id"),
+  importedAt: timestamp("imported_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/* -------------------------------------------------------------------------- */
 /* Inferred types                                                              */
 /* -------------------------------------------------------------------------- */
 
@@ -538,6 +758,17 @@ export type Attachment = typeof attachments.$inferSelect;
 export type Revision = typeof revisions.$inferSelect;
 export type CaseStudy = typeof caseStudies.$inferSelect;
 export type CaseStudyTask = typeof caseStudyTasks.$inferSelect;
+export type Domain = typeof domains.$inferSelect;
+export type ConformanceCheck = typeof conformanceChecks.$inferSelect;
+export type ConformanceResult = typeof conformanceResults.$inferSelect;
+export type Remediation = typeof remediations.$inferSelect;
+export type CostConfig = typeof costConfigs.$inferSelect;
+export type CostUsage = typeof costUsage.$inferSelect;
+export type CostFact = typeof costFacts.$inferSelect;
+export type ImportRun = typeof importRuns.$inferSelect;
+export type ConformanceStatus = (typeof conformanceStatusEnum.enumValues)[number];
+export type RemediationStatus = (typeof remediationStatusEnum.enumValues)[number];
+export type CostMethod = (typeof costMethodEnum.enumValues)[number];
 export type NodeType = (typeof nodeTypeEnum.enumValues)[number];
 export type CaseStudyTrack = (typeof caseStudyTrackEnum.enumValues)[number];
 export type TaskStatus = (typeof taskStatusEnum.enumValues)[number];
