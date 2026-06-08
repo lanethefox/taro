@@ -131,6 +131,20 @@ stays as-is; the principle-driven additions land next.
   platforms, governance, privacy, team models, connecting to the warehouse), and
   a `Voices and canon` reading list. Cross-linked into the data-modeling concepts
   (Grain, Semantics, Entities, Counting) via `links` rows. `viewer` visibility.
+- **Five domain-analytics top-level trees** (2026-06), siblings of `Data modeling`
+  and `Product analytics`: **Marketing analytics** (16), **Sales analytics** (16),
+  **Customer experience analytics** (14), **Finance analytics** (19), **Operations
+  analytics** (16) — **81 pages** seeded via the Supabase MCP (data-only, `viewer`
+  visibility). Each mirrors the same shape: a root, theory fundamentals, a
+  `… analytics practice` hub, and a per-section `… voices and canon` reading list.
+  SaaS revenue mechanics (payment processors, subscription/billing, dunning,
+  trials) is woven into Finance/Marketing, not a separate tree. Cross-linked into
+  the data-modeling + product-analytics + AE-practice concepts and across each
+  other via `links` rows. **Reproducible seeds committed:**
+  `supabase/seed_{marketing,sales,cx,finance,ops}_analytics.sql` (each
+  self-contained, idempotent) plus `supabase/seed_domains_crosslinks.sql` (run
+  after all five so cross-section wikilinks resolve). Generator: `/tmp/gen-domains.mjs`
+  (not committed). Titles are globally unique because wikilinks resolve by title.
 - The agent has **no DB access from the sandbox** unless a Supabase MCP server
   or `DATABASE_URL` env secret is configured. Generate migrations with
   `pnpm drizzle-kit generate` (no DB needed); the user (or the Supabase MCP)
