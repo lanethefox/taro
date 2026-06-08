@@ -31,6 +31,15 @@ import_runs). **M1–M6 done & deployed:**
   gaps + DoD); conformance snapshots + trend sparklines.
 - **M6** semantics governance (`/taro/metrics`) + governance-aware `/api/context`
   (per-node arm/conformance/cost + platform summary).
+- **Proper semantic layer** (replaces wiki-as-semantic-layer): a first-class
+  `metrics` table (migration `0006`, MetricFlow-shaped — type, owning model,
+  expression, ratio num/den, `detect` regex), seeded with 11 metrics on the
+  ClassDojo marts (`seed_metrics.sql`). `/taro/metrics` now shows the metrics
+  layer + drift (models recomputing a metric); the SQL analyzer's duplicate-metric
+  detection reads this table (`getMetricRegistry`) instead of the hardcoded
+  constant; `/api/context` serves metrics. Wiki = prose/principles; metrics = the
+  structured definitions. (Migrations `0004` control-center, `0005` models.sql,
+  `0006` metrics — all applied to the live DB.)
 - Seeds: `seed_domains.sql`, `seed_cost.sql`, `seed_domain_content.sql` (data-only,
   applied via Supabase MCP). Next: dbt-importer round-trip vs the live catalog;
   richer per-domain content editing; warehouse-real cost ingestion.

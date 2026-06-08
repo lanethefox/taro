@@ -22,6 +22,7 @@ import {
   type ConformanceNode,
 } from "@/lib/conformance/checks";
 import { rollupScore, scoreNode, type NodeScore } from "@/lib/conformance/score";
+import { getMetricRegistry } from "@/db/queries/metrics";
 
 export type ScoredNode = {
   type: "model" | "source";
@@ -116,6 +117,8 @@ export async function getConformanceReport(
       .where(inArray(links.sourceType, ["model", "source"])),
   ]);
 
+  const metricRegistry = await getMetricRegistry();
+
   const visModels = includePrivate
     ? modelRows
     : modelRows.filter((m) => m.visibility !== "private");
@@ -187,7 +190,7 @@ export async function getConformanceReport(
       conceptLinks: conceptLinks.get(key) ?? 0,
       decisionLinks: decisionLinks.get(key) ?? 0,
     };
-    const results = evaluateNode(node);
+    const results = evaluateNode(node, { metrics: metricRegistry });
     const counts = scoreNode(results);
     nodes.push({
       type: "model",
@@ -221,7 +224,7 @@ export async function getConformanceReport(
       conceptLinks: conceptLinks.get(key) ?? 0,
       decisionLinks: decisionLinks.get(key) ?? 0,
     };
-    const results = evaluateNode(node);
+    const results = evaluateNode(node, { metrics: metricRegistry });
     const counts = scoreNode(results);
     nodes.push({
       type: "source",

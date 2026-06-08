@@ -43,6 +43,13 @@
       "when": 1780891988119,
       "tag": "0005_eager_kang",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1780950189756,
+      "tag": "0006_romantic_machine_man",
+      "breakpoints": true
     }
   ]
 }
